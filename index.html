@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Пивной Барон — Telegram Game</title>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --primary: #f59e0b;
+      --accent: #ff0055;
+      --cyan: #00f3ff;
+      --bg: #090511;
+      --card-bg: rgba(22, 15, 33, 0.95);
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: #fff;
+      position: fixed;
+      touch-action: none;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      max-width: 540px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Верхняя плашка с литрами и монетами */
+    .top-hud {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(13, 8, 22, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .stat-val {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    /* Игровая сцена с пацаном */
+    #stage-wrap {
+      flex: 1.1;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Чугаметр (индикатор зажатия пальца) */
+    .chug-overlay {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 320px;
+      background: rgba(14, 9, 23, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 10px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      pointer-events: none;
+    }
+
+    .meter-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .meter-track {
+      position: relative;
+      height: 16px;
+      background: #1e132b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .zone-sweet {
+      position: absolute;
+      left: 40%;
+      width: 35%;
+      height: 100%;
+      background: #10b981;
+      box-shadow: 0 0 12px #10b981;
+    }
+    .zone-danger {
+      position: absolute;
+      right: 0;
+      width: 25%;
+      height: 100%;
+      background: #ef4444;
+    }
+
+    .needle {
+      position: absolute;
+      top: -2px;
+      width: 5px;
+      height: 20px;
+      background: #fff;
+      border-radius: 3px;
+      box-shadow: 0 0 10px #fff;
+      transform: translateX(-50%);
+      transition: left 0.04s ease-out;
+    }
+
+    /* Подсказка */
+    .press-hint {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      font-weight: 800;
+      color: #fcd34d;
+      text-transform: uppercase;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Нижняя панель: Магазин улучшений */
+    .bottom-shop {
+      flex: 1;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .shop-tabs {
+      display: flex;
+      background: #120a1b;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 0;
+      background: none;
+      border: none;
+      color: #948aa5;
+      font-weight: 800;
+      font-size: 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: #fff;
+      border-bottom-color: var(--primary);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .cards-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .card {
+      background: #180f24;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon {
+      font-size: 26px;
+      width: 42px;
+      height: 42px;
+      background: #251638;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .card-sub {
+      font-size: 11px;
+      color: #a295b5;
+    }
+
+    .btn-buy {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 12px;
+      color: #0b0711;
+      cursor: pointer;
+    }
+    .btn-buy:disabled {
+      background: #2b1f38;
+      color: #635475;
+      cursor: not-allowed;
+    }
+    .btn-equipped {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #10b981;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Верхняя строка -->
+  <div class="top-hud">
+    <div class="stat-pill">
+      <span>🍺</span>
+      <span class="stat-val" id="hud-liters">0.0 L</span>
+    </div>
+    <div class="stat-pill">
+      <span>💰</span>
+      <span class="stat-val" id="hud-coins">0 ₽</span>
+    </div>
+  </div>
+
+  <!-- Холст игры -->
+  <div id="stage-wrap">
+    <div class="press-hint" id="hint-msg">ЖМИ И ДЕРЖИ В ЗЕЛЁНОЙ ЗОНЕ!</div>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Чугаметр -->
+    <div class="chug-overlay">
+      <div class="meter-head">
+        <span>ПОТОК ГЛОТКА</span>
+        <span id="combo-display" style="color: var(--primary);">x1.0</span>
+      </div>
+      <div class="meter-track">
+        <div class="zone-sweet"></div>
+        <div class="zone-danger"></div>
+        <div class="needle" id="chug-needle" style="left: 0%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Магазин -->
+  <div class="bottom-shop">
+    <div class="shop-tabs">
+      <button class="tab-btn active" onclick="openTab('beers')">🍺 Сорта</button>
+      <button class="tab-btn" onclick="openTab('mugs')">🏺 Бокалы</button>
+      <button class="tab-btn" onclick="openTab('skins')">👕 Шмот</button>
+      <button class="tab-btn" onclick="openTab('auto')">⚡ Авто</button>
+    </div>
+    <div class="cards-list" id="shop-container"></div>
+  </div>
+</div>
+
+<script>
+  // Инициализация Telegram
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.ready();
+    tg.expand();
+    tg.enableClosingConfirmation();
+  }
+
+  function haptic(type = 'light') {
+    if (tg?.HapticFeedback) {
+      if (type === 'error') tg.HapticFeedback.notificationOccurred('error');
+      else if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+      else tg.HapticFeedback.impactOccurred(type);
+    }
+  }
+
+  // Звуковой синтезатор
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let actx = null;
+  function playGulpSound() {
+    if (!actx) actx = new AudioCtx();
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.frequency.setValueAtTime(200, actx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(70, actx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.2, actx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(actx.destination);
+    osc.start();
+    osc.stop(actx.currentTime + 0.11);
+  }
+
+  // База данных игры
+  const STATE = {
+    liters: 0,
+    coins: 10,
+    chugPower: 0,
+    isPressing: false,
+    chokeTimer: 0,
+    combo: 1,
+    curBeer: 'lager',
+    curMug: 'glass',
+    curSkin: 'hoodie',
+    autoLps: 0
+  };
+
+  const BEERS = {
+    lager: { name: "Жигулёвское", cost: 0, mult: 1, color: "#f59e0b", foam: "#fff", icon: "🍺", owned: true },
+    dark: { name: "Тёмный Стаут", cost: 150, mult: 4, color: "#1f1209", foam: "#d4b08c", icon: "☕", owned: false },
+    sour: { name: "Вишнёвый Саур", cost: 800, mult: 15, color: "#e11d48", foam: "#fecdd3", icon: "🍒", owned: false },
+    cyber: { name: "Кибер-Эль 2077", cost: 4000, mult: 60, color: "#00f3ff", foam: "#67e8f9", icon: "⚡", owned: false }
+  };
+
+  const MUGS = {
+    glass: { name: "Гранёный Стакан", cost: 0, mult: 1, icon: "🥛", owned: true },
+    stein: { name: "Дубовая Кружка", cost: 200, mult: 3, icon: "🍺", owned: false },
+    horn: { name: "Рог Викинга", cost: 1200, mult: 12, icon: "📯", owned: false },
+    gold: { name: "Золотой Кубок", cost: 6000, mult: 45, icon: "🏆", owned: false }
+  };
+
+  const SKINS = {
+    hoodie: { name: "Черное Худи", cost: 0, color: "#18181b", glow: "#71717a", icon: "🧥", owned: true },
+    leather: { name: "Косуха Рокера", cost: 300, color: "#09090b", glow: "#f43f5e", icon: "🎸", owned: false },
+    miami: { name: "Гавайка Майами", cost: 1500, color: "#06b6d4", glow: "#f43f5e", icon: "🌺", owned: false },
+    suit: { name: "Смокинг Босса", cost: 5000, color: "#000000", glow: "#f59e0b", icon: "🤵", owned: false }
+  };
+
+  const AUTO = [
+    { id: 'tube', name: 'Авто-трубочка', cost: 50, lps: 0.2, count: 0, icon: '🥤' },
+    { id: 'friend', name: 'Друган с пивом', cost: 300, lps: 1.5, count: 0, icon: '🧔' },
+    { id: 'keg', name: 'Кег прямо в рот', cost: 2000, lps: 8.0, count: 0, icon: '🛢️' }
+  ];
+
+  let activeTab = 'beers';
+
+  // Отрисовка на Canvas
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h;
+  let wave = 0;
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    w = canvas.width = rect.width * (window.devicePixelRatio || 1);
+    h = canvas.height = rect.height * (window.devicePixelRatio || 1);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function drawGuy() {
+    ctx.clearRect(0, 0, w, h);
+    wave += 0.05;
+
+    const cx = w * 0.5;
+    const cy = h * 0.65;
+    const s = Math.min(w, h) / 360;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+
+    const isDrinking = STATE.chugPower > 30;
+    const skin = SKINS[STATE.curSkin];
+    const beer = BEERS[STATE.curBeer];
+
+    // Тело / Одежда
+    ctx.beginPath();
+    ctx.moveTo(-60, 20); ctx.lineTo(60, 20); ctx.lineTo(50, 160); ctx.lineTo(-50, 160);
+    ctx.closePath();
+    ctx.fillStyle = skin.color;
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = skin.glow;
+    ctx.stroke();
+
+    // Шея
+    ctx.fillStyle = '#f59e0b';
+    ctx.fillRect(-18, -25, 36, 50);
+
+    // Голова
+    ctx.save();
+    ctx.translate(0, -50);
+    if (isDrinking) ctx.rotate(-0.15);
+
+    // Лицо
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 34, 40, 0, 0, Math.PI * 2);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fill();
+
+    // Борода
+    ctx.beginPath();
+    ctx.arc(0, 10, 30, 0, Math.PI);
+    ctx.fillStyle = '#27170e';
+    ctx.fill();
+
+    // Очки
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(-32, -15, 28, 18);
+    ctx.fillRect(4, -15, 28, 18);
+    ctx.fillStyle = 'rgba(0, 243, 255, 0.4)';
+    ctx.fillRect(-28, -12, 10, 12);
+    ctx.fillRect(8, -12, 10, 12);
+
+    // Рот
+    if (isDrinking) {
+      ctx.beginPath();
+      ctx.ellipse(0, 20, 10, 8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#5c1010';
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Рука с бокалом
+    ctx.save();
+    ctx.translate(isDrinking ? -10 : 35, isDrinking ? -65 : 40);
+
+    // Бокал
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-20, -25, 40, 60);
+    ctx.fillRect(-20, -25, 40, 60);
+
+    // Пиво внутри
+    ctx.fillStyle = beer.color;
+    ctx.fillRect(-18, -10, 36, 43);
+
+    // Пена
+    ctx.fillStyle = beer.foam;
+    ctx.beginPath();
+    ctx.ellipse(0, -10, 18, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // Игровой цикл
+  let lastT = performance.now();
+  function loop(now) {
+    const dt = now - lastT;
+    lastT = now;
+
+    if (STATE.chokeTimer > 0) {
+      STATE.chokeTimer -= dt;
+      STATE.chugPower = 0;
+      document.getElementById('hint-msg').innerText = "ПОПЕРХНУЛСЯ! ДЫШИ...";
+      document.getElementById('hint-msg').style.color = "#ef4444";
+    } else if (STATE.isPressing) {
+      STATE.chugPower = Math.min(100, STATE.chugPower + dt * 0.12);
+
+      if (STATE.chugPower > 95) {
+        STATE.chokeTimer = 1500;
+        haptic('error');
+      } else {
+        const isSweet = STATE.chugPower >= 40 && STATE.chugPower <= 75;
+        const b = BEERS[STATE.curBeer];
+        const m = MUGS[STATE.curMug];
+
+        if (isSweet) {
+          STATE.combo = Math.min(5, STATE.combo + 0.01);
+          document.getElementById('hint-msg').innerText = "🔥 ИДЕАЛЬНЫЙ ПОТОК! 🔥";
+          document.getElementById('hint-msg').style.color = "#10b981";
+        } else {
+          document.getElementById('hint-msg').innerText = "ЖМИ И ДЕРЖИ В ЗЕЛЁНОЙ ЗОНЕ!";
+          document.getElementById('hint-msg').style.color = "#fcd34d";
+        }
+
+        const addedLiters = (0.002 * m.mult * (isSweet ? 2.5 : 1.0));
+        STATE.liters += addedLiters;
+        STATE.coins += addedLiters * 15 * b.mult * STATE.combo;
+
+        if (Math.random() < 0.25) {
+          playGulpSound();
+          haptic('light');
+        }
+      }
+    } else {
+      STATE.chugPower = Math.max(0, STATE.chugPower - dt * 0.1);
+      STATE.combo = 1;
+      document.getElementById('hint-msg').innerText = "ЖМИ И ДЕРЖИ ЭКРАН!";
+      document.getElementById('hint-msg').style.color = "#fcd34d";
+    }
+
+    // Пассивный доход
+    STATE.liters += STATE.autoLps * (dt / 1000);
+    STATE.coins += STATE.autoLps * 5 * (dt / 1000);
+
+    // UI
+    document.getElementById('hud-liters').innerText = STATE.liters.toFixed(1) + ' L';
+    document.getElementById('hud-coins').innerText = Math.floor(STATE.coins).toLocaleString() + ' ₽';
+    document.getElementById('chug-needle').style.left = STATE.chugPower + '%';
+    document.getElementById('combo-display').innerText = 'x' + STATE.combo.toFixed(1);
+
+    drawGuy();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  // Управление пальцем/мышкой
+  const stage = document.getElementById('stage-wrap');
+  stage.addEventListener('pointerdown', (e) => { e.preventDefault(); STATE.isPressing = true; });
+  window.addEventListener('pointerup', () => { STATE.isPressing = false; });
+  window.addEventListener('pointercancel', () => { STATE.isPressing = false; });
+
+  // Логика Магазина
+  function openTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    renderShop();
+  }
+
+  function renderShop() {
+    const cont = document.getElementById('shop-container');
+    cont.innerHTML = '';
+
+    if (activeTab === 'beers') {
+      Object.keys(BEERS).forEach(k => {
+        const item = BEERS[k];
+        const isEq = STATE.curBeer === k;
+        cont.innerHTML += makeCard(item.name, `Множитель: x${item.mult}`, item.icon, item.cost, isEq, item.owned, `setEq('beer','${k}')`, `buy('beer','${k}')`);
+      });
+    } else if (activeTab === 'mugs') {
+      Object.keys(MUGS).forEach(k => {
+        const item = MUGS[k];
+        const isEq = STATE.curMug === k;
+        cont.innerHTML += makeCard(item.name, `Объем глотка: x${item.mult}`, item.icon, item.cost, isEq, item.owned, `setEq('mug','${k}')`, `buy('mug','${k}')`);
+      });
+    } else if (activeTab === 'skins') {
+      Object.keys(SKINS).forEach(k => {
+        const item = SKINS[k];
+        const isEq = STATE.curSkin === k;
+        cont.innerHTML += makeCard(item.name, `Стиль пацана`, item.icon, item.cost, isEq, item.owned, `setEq('skin','${k}')`, `buy('skin','${k}')`);
+      });
+    } else if (activeTab === 'auto') {
+      AUTO.forEach(a => {
+        cont.innerHTML += `
+          <div class="card">
+            <div class="card-meta">
+              <div class="card-icon">${a.icon}</div>
+              <div>
+                <div class="card-title">${a.name} (${a.count})</div>
+                <div class="card-sub">+${a.lps} L/сек</div>
+              </div>
+            </div>
+            <button class="btn-buy" ${STATE.coins < a.cost ? 'disabled' : ''} onclick="buyAuto('${a.id}')">${a.cost} ₽</button>
+          </div>
+        `;
+      });
+    }
+  }
+
+  function makeCard(title, sub, icon, cost, isEq, owned, eqFn, buyFn) {
+    let btn = '';
+    if (isEq) btn = `<div class="btn-equipped">В руках</div>`;
+    else if (owned) btn = `<button class="btn-buy" onclick="${eqFn}">Надеть</button>`;
+    else btn = `<button class="btn-buy" ${STATE.coins < cost ? 'disabled' : ''} onclick="${buyFn}">${cost} ₽</button>`;
+
+    return `
+      <div class="card">
+        <div class="card-meta">
+          <div class="card-icon">${icon}</div>
+          <div>
+            <div class="card-title">${title}</div>
+            <div class="card-sub">${sub}</div>
+          </div>
+        </div>
+        ${btn}
+      </div>
+    `;
+  }
+
+  window.buy = function(type, id) {
+    let item = (type === 'beer' ? BEERS : type === 'mug' ? MUGS : SKINS)[id];
+    if (STATE.coins >= item.cost && !item.owned) {
+      STATE.coins -= item.cost;
+      item.owned = true;
+      setEq(type, id);
+    }
+  };
+
+  window.setEq = function(type, id) {
+    if (type === 'beer') STATE.curBeer = id;
+    if (type === 'mug') STATE.curMug = id;
+    if (type === 'skin') STATE.curSkin = id;
+    haptic('medium');
+    renderShop();
+  };
+
+  window.buyAuto = function(id) {
+    const item = AUTO.find(x => x.id === id);
+    if (STATE.coins >= item.cost) {
+      STATE.coins -= item.cost;
+      item.count++;
+      STATE.autoLps += item.lps;
+      item.cost = Math.floor(item.cost * 1.4);
+      haptic('medium');
+      renderShop();
+    }
+  };
+
+  renderShop();
+</script>
+</body>
+</html>
