@@ -1785,12 +1785,12 @@ body.low-performance .golden-barrel{
   position:relative;
   transition:transform 4s cubic-bezier(.17,.67,.3,1);
 }
-.roulette-wheel.spinning{
-  animation:wheelShake .15s linear infinite;
+.roulette-pointer.ticking{
+  animation:pointerTick .1s ease-in-out infinite alternate;
 }
-@keyframes wheelShake{
-  0%,100%{transform:rotate(0);}
-  50%{transform:rotate(0.5deg);}
+@keyframes pointerTick{
+  0%{transform:translateX(-50%) rotate(0deg);}
+  100%{transform:translateX(-50%) rotate(-8deg);}
 }
 .roulette-wheel-item{
   position:absolute;
@@ -3291,6 +3291,7 @@ window.nextOnbSlide = () => {
 
 /* ===== BOOT ===== */
 (function boot(){
+  if (typeof isSecretUnlocked === 'function' && (isSecretUnlocked() || STATE.charId === 'secret')) ensureSecretInCharacters();
   if (STATE.charId && CHARACTERS.find(c=>c.id===STATE.charId)){
     // считаем оффлайн-доход
     applyOfflineEarnings();
@@ -5681,7 +5682,7 @@ function renderQuestsPanel(){
     const pct = Math.min(100, (stat / def.target) * 100);
     const claimed = q.claimed;
 
-    const btnText = claimed ? '✓' : (done ? 'Забрать' : `${stat}/${def.target}`);
+    const btnText = claimed ? '✓' : (done ? 'Забрать' : `${Math.floor(stat)}/${def.target}`);
     const btnDis = claimed || !done ? 'disabled' : '';
 
     html += `
@@ -5783,7 +5784,7 @@ window.openRoulette = () => {
       <div class="roulette-pointer"></div>
       <div class="roulette-wheel" id="roulette-wheel">
         ${wheelItems}
-        <div class="roulette-center">КРУТИ</div>
+        <div class="roulette-center" onclick="spinRoulette()" style="cursor:pointer">КРУТИ</div>
       </div>
     </div>
     <div class="roulette-result" id="roulette-result">
@@ -5833,7 +5834,8 @@ window.spinRoulette = () => {
 
   // Показываем процесс
   resultEl.innerHTML = `<div class="rr-title" style="color:#a89468">Крутим…</div>`;
-  wheel.classList.add('spinning');
+  const pointer = document.querySelector('.roulette-pointer');
+  if (pointer) pointer.classList.add('ticking');
 
   // Фиксируем начальное значение, чтобы каждый спин был новым
   wheel.style.transition = 'transform 4s cubic-bezier(.17,.67,.3,1)';
@@ -5851,7 +5853,8 @@ window.spinRoulette = () => {
   playBarrel();
 
   setTimeout(() => {
-    wheel.classList.remove('spinning');
+    const pointer = document.querySelector('.roulette-pointer');
+  if (pointer) pointer.classList.remove('ticking');
     applyRoulettePrize(prize);
 
     // Сохраняем старый last spin ДО обновления
@@ -6106,7 +6109,7 @@ function refreshA3Panels(){
 setTimeout(refreshA3Panels, 300);
 
 // Обновляем панели когда открыт профиль — раз в 1.5 сек
-setInterval(refreshA3Panels, 1500);
+// setInterval(refreshA3Panels, 1500);
 
 // Обновляем панели при переключении на вкладку профиль
 (function hookProfileTab(){
@@ -6426,7 +6429,7 @@ function refreshBPanels(){
 }
 
 setTimeout(refreshBPanels, 400);
-setInterval(refreshBPanels, 1500);
+// setInterval(refreshBPanels, 1500);
 
 // Хук на таб профиля
 (function hookProfileTabB(){
