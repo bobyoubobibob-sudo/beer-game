@@ -1602,7 +1602,737 @@ body.low-performance .golden-barrel{
   .topbar{padding-top:max(calc(8px + env(safe-area-inset-top)), 20px);}
   .tabbar{padding-bottom:max(env(safe-area-inset-bottom), 0px);}
 }
+/* =========================================================
+   ЧАСТЬ A1 — РУЛЕТКА + КВЕСТЫ + НАСТРОЙКИ + ТЕМЫ
+   ========================================================= */
 
+/* ============ DAILY QUESTS PANEL ============ */
+.quests-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#1a0f2a 0%,#0e0818 100%);
+  border:1px solid #4a2a8a;
+  position:relative;overflow:hidden;
+}
+.quests-panel::before{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:70%;height:120%;
+  background:radial-gradient(circle,rgba(165,102,255,.18),transparent 65%);
+  pointer-events:none;
+}
+.quests-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.quests-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#d9c2ff;
+}
+.quests-timer{
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;
+  color:#a495c9;
+}
+.quest-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(165,102,255,.15);
+  margin-bottom:6px;
+  position:relative;overflow:hidden;
+}
+.quest-item:last-child{margin-bottom:0;}
+.quest-item.done{
+  border-color:#7cb342;
+  background:rgba(124,179,66,.08);
+}
+.quest-item.claimed{
+  opacity:.5;
+}
+.quest-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(180deg,#251d38,#181122);
+  border:1px solid rgba(165,102,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.quest-info{flex:1;min-width:0;}
+.quest-name{
+  font-weight:800;font-size:12px;color:var(--text);
+  margin-bottom:2px;
+}
+.quest-progress{
+  height:4px;border-radius:3px;background:#1a1230;
+  overflow:hidden;margin-bottom:3px;
+}
+.quest-progress-fill{
+  height:100%;background:linear-gradient(90deg,#a566ff,#c9a8ff);
+  box-shadow:0 0 6px rgba(165,102,255,.6);
+  transition:width .3s;
+}
+.quest-item.done .quest-progress-fill{
+  background:linear-gradient(90deg,#7cb342,#a4d860);
+  box-shadow:0 0 6px rgba(124,179,66,.6);
+}
+.quest-meta{
+  font-size:10px;color:var(--dim);font-weight:700;
+  display:flex;justify-content:space-between;
+}
+.quest-reward{
+  font-family:'Unbounded',sans-serif;font-size:10px;
+  color:#f7c948;font-weight:700;
+}
+.btn-quest{
+  flex-shrink:0;padding:6px 10px;border:none;border-radius:7px;
+  background:var(--gold-grad);color:#1a1005;
+  font-weight:800;font-size:10px;letter-spacing:.3px;
+  cursor:pointer;transition:transform .1s;
+  text-transform:uppercase;
+}
+.btn-quest:active{transform:scale(.94);}
+.btn-quest:disabled{
+  background:#2a1f3a;color:#5a4d75;cursor:not-allowed;
+}
+.btn-quest.done-anim{
+  animation:questDone .6s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes questDone{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.25);box-shadow:0 0 20px rgba(124,179,66,.7);}
+  100%{transform:scale(1);}
+}
+
+/* ============ ROULETTE ============ */
+.roulette-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#2a1a0d 0%,#1a0f08 100%);
+  border:1px solid #6a4a1a;
+  position:relative;overflow:hidden;
+}
+.roulette-panel::before{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:70%;height:120%;
+  background:radial-gradient(circle,rgba(247,201,72,.18),transparent 65%);
+  pointer-events:none;
+}
+.roulette-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;
+}
+.roulette-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#f5c97a;
+}
+.roulette-status{
+  font-family:'Unbounded',sans-serif;font-size:10px;
+  color:#a89468;font-weight:700;
+}
+.roulette-icon-row{
+  display:flex;justify-content:center;gap:8px;
+  margin-bottom:12px;
+  font-size:26px;line-height:1;
+}
+.roulette-icon-row span{filter:grayscale(.6) opacity(.7);}
+.btn-roulette{
+  width:100%;padding:13px;border:none;border-radius:11px;
+  background:var(--gold-grad);color:#1a1005;
+  font-family:'Unbounded',sans-serif;font-weight:700;
+  font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  box-shadow:0 4px 0 #7a4d0f,0 0 20px rgba(247,201,72,.3);
+  cursor:pointer;transition:transform .1s;
+  position:relative;overflow:hidden;
+}
+.btn-roulette:active{transform:translateY(2px);}
+.btn-roulette:disabled{
+  background:#241a10;color:#5a4a30;
+  box-shadow:none;cursor:not-allowed;
+}
+
+/* Рулетка — модалка со колесом */
+.roulette-modal{
+  padding:24px 20px;
+}
+.roulette-wheel-wrap{
+  position:relative;
+  width:260px;height:260px;
+  margin:14px auto 20px;
+}
+.roulette-pointer{
+  position:absolute;top:-8px;left:50%;
+  transform:translateX(-50%);
+  width:0;height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:22px solid #f7c948;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));
+  z-index:5;
+}
+.roulette-wheel{
+  width:100%;height:100%;border-radius:50%;
+  background:conic-gradient(
+    #f7c948 0deg 45deg,
+    #a566ff 45deg 90deg,
+    #4a9eff 90deg 135deg,
+    #7cb342 135deg 180deg,
+    #ff8a1a 180deg 225deg,
+    #d94343 225deg 270deg,
+    #c9a8ff 270deg 315deg,
+    #f5a623 315deg 360deg
+  );
+  box-shadow:
+    0 0 0 4px #3a2a18,
+    0 0 0 6px #7a4d0f,
+    0 12px 40px rgba(0,0,0,.7),
+    inset 0 0 30px rgba(0,0,0,.3);
+  position:relative;
+  transition:transform 4s cubic-bezier(.17,.67,.3,1);
+}
+.roulette-wheel.spinning{
+  animation:wheelShake .15s linear infinite;
+}
+@keyframes wheelShake{
+  0%,100%{transform:rotate(0);}
+  50%{transform:rotate(0.5deg);}
+}
+.roulette-wheel-item{
+  position:absolute;
+  top:50%;left:50%;
+  transform-origin:0 0;
+  font-size:22px;line-height:1;
+  pointer-events:none;
+}
+.roulette-center{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:76px;height:76px;border-radius:50%;
+  background:radial-gradient(circle,#3a2a18,#1a1008);
+  border:3px solid #7a4d0f;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Unbounded',sans-serif;font-weight:800;
+  font-size:11px;color:#f7c948;
+  letter-spacing:.5px;z-index:4;
+  box-shadow:0 0 20px rgba(0,0,0,.6),inset 0 0 15px rgba(247,201,72,.3);
+}
+.roulette-result{
+  min-height:56px;
+  margin-top:8px;
+  text-align:center;
+  font-family:'Unbounded',sans-serif;
+}
+.roulette-result .rr-icon{font-size:44px;line-height:1;display:block;margin-bottom:6px;}
+.roulette-result .rr-title{
+  font-size:14px;font-weight:700;color:#f7c948;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.roulette-result .rr-sub{
+  font-size:11px;color:#a89468;margin-top:2px;
+  font-weight:600;font-family:'Manrope',sans-serif;
+}
+
+/* ============ SETTINGS PANEL (в профиле) ============ */
+.settings-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#0f1820 0%,#080c12 100%);
+  border:1px solid #2a4a6a;
+}
+.settings-head{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:#a8d8e8;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.settings-section-title{
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;
+  color:#7a94a8;margin:10px 0 6px;
+}
+.settings-section-title:first-of-type{margin-top:0;}
+
+.settings-row{
+  display:flex;gap:6px;flex-wrap:wrap;
+}
+
+.theme-btn, .click-fx-btn{
+  flex:1;min-width:64px;
+  padding:10px 8px;border-radius:10px;
+  background:linear-gradient(180deg,#1a242e,#0e1418);
+  border:1px solid #2a4a6a;
+  color:#a8d8e8;
+  font-family:'Manrope',sans-serif;
+  font-weight:800;font-size:10px;
+  letter-spacing:.3px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.theme-btn .ico, .click-fx-btn .ico{font-size:20px;line-height:1;}
+.theme-btn:active, .click-fx-btn:active{transform:scale(.96);}
+.theme-btn.active, .click-fx-btn.active{
+  border-color:var(--amber);
+  background:linear-gradient(180deg,#2a1f0d,#1a1208);
+  color:var(--amber);
+  box-shadow:0 0 12px rgba(245,166,35,.3);
+}
+
+/* ============ ТЕМЫ ИНТЕРФЕЙСА ============ */
+/* ===== ДЕНЬ ===== */
+body[data-theme="day"]{
+  --bg:#f0e8d8;
+  --bg-2:#e8dfc8;
+  --panel:#faf5e8;
+  --panel-2:#fff9ee;
+  --border:#d4c8a8;
+  --border-2:#c4b898;
+  --text:#1a1408;
+  --dim:#8a7a5a;
+}
+body[data-theme="day"] .topbar,
+body[data-theme="day"] .tabbar{
+  background:linear-gradient(180deg,#faf5e8,#f0e8d8);
+}
+body[data-theme="day"] .player-nick,
+body[data-theme="day"] .player-loc{color:#1a1408;}
+body[data-theme="day"] .player-loc{color:#8a7a5a;}
+body[data-theme="day"] .card{
+  background:linear-gradient(180deg,#fff9ee,#faf5e8);
+}
+body[data-theme="day"] .card-title{color:#1a1408;}
+body[data-theme="day"] .card-sub{color:#8a7a5a;}
+body[data-theme="day"] .screen{
+  background:linear-gradient(180deg,#f0e8d8,#e0d8c0);
+}
+body[data-theme="day"] #screen-game{background:radial-gradient(ellipse at 50% 30%,#f5eed8 0%,#e0d5b8 70%);}
+body[data-theme="day"] .hint{color:#c97e15;}
+body[data-theme="day"] .meter{
+  background:linear-gradient(180deg,rgba(255,250,240,.98),rgba(248,240,220,.98));
+  border-color:#d4c8a8;
+}
+body[data-theme="day"] .meter-head{color:#7a6a4a;}
+body[data-theme="day"] .track{background:linear-gradient(180deg,#d8c8a8,#e8d8b8);}
+body[data-theme="day"] .online-bar{background:rgba(250,245,232,.9);color:#7a6a4a;}
+body[data-theme="day"] .shop-cats{background:#f0e8d8;}
+body[data-theme="day"] .cat{background:#faf5e8;color:#8a7a5a;}
+body[data-theme="day"] .cat.active{color:#1a1005;}
+
+/* ===== РЕТРО (CRT-монитор) ===== */
+body[data-theme="retro"]{
+  --bg:#0a1508;
+  --bg-2:#0e1e0c;
+  --panel:#14220f;
+  --panel-2:#1a2c14;
+  --border:#2a4a20;
+  --border-2:#3a5a2a;
+  --text:#7aff7a;
+  --dim:#4a9a3a;
+  --amber:#a4ff44;
+}
+body[data-theme="retro"] #app::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1000;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,.15) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode:multiply;
+}
+body[data-theme="retro"] #app::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:999;
+  background:radial-gradient(ellipse at 50% 50%,transparent 50%,rgba(0,0,0,.6) 100%);
+}
+body[data-theme="retro"] .topbar,
+body[data-theme="retro"] .tabbar{
+  background:linear-gradient(180deg,#0e1e0c,#0a1508);
+  border-color:#2a4a20;
+}
+body[data-theme="retro"] .brand,
+body[data-theme="retro"] .player-nick{color:#a4ff44;}
+body[data-theme="retro"] .card{
+  background:linear-gradient(180deg,#1a2c14,#14220f);
+  border-color:#2a4a20;
+}
+body[data-theme="retro"] .card-title{color:#7aff7a;}
+body[data-theme="retro"] .card-sub{color:#4a9a3a;}
+body[data-theme="retro"] .btn-buy{
+  background:linear-gradient(180deg,#a4ff44,#6aaa1a);
+  color:#0a1508;
+}
+body[data-theme="retro"] .meter{
+  background:linear-gradient(180deg,rgba(14,30,12,.98),rgba(10,21,8,.98));
+  border-color:#2a4a20;
+}
+body[data-theme="retro"] .hint{color:#a4ff44;text-shadow:0 0 8px #a4ff44;}
+
+/* ===== НЕОН ===== */
+body[data-theme="neon"]{
+  --bg:#08001a;
+  --bg-2:#10082a;
+  --panel:#1a0a3a;
+  --panel-2:#22124a;
+  --border:#3a1a7a;
+  --border-2:#5a2aaa;
+  --text:#e0d0ff;
+  --dim:#8a6ac0;
+  --amber:#ff36ee;
+}
+body[data-theme="neon"] .brand{
+  background:linear-gradient(135deg,#ff36ee,#36e0ff,#a566ff);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 12px #ff36ee) drop-shadow(0 0 24px #36e0ff);
+}
+body[data-theme="neon"] .topbar,
+body[data-theme="neon"] .tabbar{
+  background:linear-gradient(180deg,#10082a,#08001a);
+  border-color:#3a1a7a;
+}
+body[data-theme="neon"] .topbar::after,
+body[data-theme="neon"] .tabbar::before{
+  background:linear-gradient(90deg,transparent,#ff36ee,#36e0ff,transparent);
+  height:2px;
+  filter:drop-shadow(0 0 8px #ff36ee);
+}
+body[data-theme="neon"] .pill{
+  border-color:#5a2aaa;
+  box-shadow:0 0 12px rgba(255,54,238,.3),inset 0 0 8px rgba(54,224,255,.15);
+}
+body[data-theme="neon"] .pill .val{
+  color:#ff36ee;
+  text-shadow:0 0 8px #ff36ee;
+}
+body[data-theme="neon"] .card{
+  background:linear-gradient(180deg,#22124a,#1a0a3a);
+  border-color:#5a2aaa;
+  box-shadow:inset 0 0 20px rgba(255,54,238,.08);
+}
+body[data-theme="neon"] .card-title{color:#e0d0ff;}
+body[data-theme="neon"] .card-sub{color:#8a6ac0;}
+body[data-theme="neon"] .btn-buy{
+  background:linear-gradient(135deg,#ff36ee,#a566ff);
+  color:#fff;
+  box-shadow:0 0 20px rgba(255,54,238,.6),0 2px 0 rgba(0,0,0,.4);
+}
+body[data-theme="neon"] .btn-buy:disabled{
+  background:#2a1a4a;color:#5a4a7a;
+  box-shadow:none;
+}
+body[data-theme="neon"] .meter{
+  border-color:#5a2aaa;
+  box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 30px rgba(255,54,238,.2),inset 0 1px 0 rgba(255,54,238,.2);
+}
+body[data-theme="neon"] .track-fill{
+  box-shadow:0 0 30px var(--bar-color),inset 0 -3px 6px rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.35);
+}
+body[data-theme="neon"] .hint{
+  color:#ff36ee;
+  text-shadow:0 0 12px #ff36ee,0 0 24px #36e0ff;
+}
+body[data-theme="neon"] .tabbar button.active{
+  color:#ff36ee;
+  text-shadow:0 0 8px #ff36ee;
+}
+body[data-theme="neon"] .tabbar button.active::before{
+  background:#ff36ee;
+  box-shadow:0 0 16px #ff36ee;
+}
+
+/* ============ ЭФФЕКТЫ КЛИКА ============ */
+.click-fx-particle{
+  position:fixed;
+  pointer-events:none;
+  z-index:250;
+  font-size:22px;line-height:1;
+  animation:clickFxFly 1s cubic-bezier(.2,.8,.2,1) forwards;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+@keyframes clickFxFly{
+  0%{transform:translate(-50%,-50%) scale(.4);opacity:1;}
+  30%{transform:translate(-50%,-120%) scale(1.1) rotate(15deg);opacity:1;}
+  100%{transform:translate(-50%,-220%) scale(.7) rotate(-15deg);opacity:0;}
+}
+/* =========================================================
+   ЧАСТЬ B1 — КОЛЛЕКЦИЯ + СЕКРЕТНЫЙ ПЕРСОНАЖ + СКИНЫ ЗА АЧИВКИ
+   ========================================================= */
+
+/* ============ COLLECTION ============ */
+.collection-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#1a1420 0%,#0e0a14 100%);
+  border:1px solid #4a3a5a;
+  position:relative;overflow:hidden;
+}
+.collection-panel::before{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:70%;height:120%;
+  background:radial-gradient(circle,rgba(200,140,255,.12),transparent 65%);
+  pointer-events:none;
+}
+.collection-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.collection-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#d9c2ff;
+}
+.collection-count{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  color:#a495c9;
+}
+
+/* Редкости — цвета */
+:root{
+  --rar-common:    #8a7f6b;
+  --rar-rare:      #4a9eff;
+  --rar-epic:      #a566ff;
+  --rar-legendary: #f7c948;
+  --rar-mythic:    #ff36ee;
+}
+
+.collection-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.col-card{
+  aspect-ratio:1;
+  border-radius:12px;
+  background:linear-gradient(180deg,#1a1420,#0e0a14);
+  border:1px solid #3a2a4a;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:6px;
+  position:relative;overflow:hidden;
+  transition:all .3s cubic-bezier(.2,.8,.2,1);
+}
+.col-card.locked{
+  filter:grayscale(1);
+  opacity:.35;
+}
+.col-card.unlocked{
+  filter:none;
+  opacity:1;
+}
+.col-card.unlocked::after{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:12px;
+  pointer-events:none;
+  box-shadow:inset 0 0 20px var(--card-glow, transparent);
+}
+.col-card .cc-icon{
+  font-size:26px;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.col-card .cc-name{
+  font-family:'Manrope',sans-serif;font-weight:800;font-size:8px;
+  color:var(--text);text-align:center;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  width:100%;
+  padding:0 2px;
+}
+.col-card .cc-rar{
+  position:absolute;top:3px;left:3px;
+  font-family:'Unbounded',sans-serif;font-size:6px;font-weight:800;
+  letter-spacing:.5px;text-transform:uppercase;
+  padding:1px 4px;border-radius:4px;
+  background:rgba(0,0,0,.5);
+}
+
+/* Редкость — цвет обводки + свечение */
+.col-card[data-rar="common"]{
+  border-color:rgba(138,127,107,.5);
+  --card-glow:rgba(138,127,107,.3);
+}
+.col-card[data-rar="rare"]{
+  border-color:rgba(74,158,255,.7);
+  --card-glow:rgba(74,158,255,.5);
+  box-shadow:0 0 12px rgba(74,158,255,.25);
+}
+.col-card[data-rar="rare"] .cc-rar{background:rgba(74,158,255,.3);color:#a8d8ff;}
+.col-card[data-rar="epic"]{
+  border-color:rgba(165,102,255,.8);
+  --card-glow:rgba(165,102,255,.6);
+  box-shadow:0 0 16px rgba(165,102,255,.35);
+}
+.col-card[data-rar="epic"] .cc-rar{background:rgba(165,102,255,.3);color:#d9c2ff;}
+.col-card[data-rar="legendary"]{
+  border-color:rgba(247,201,72,.9);
+  --card-glow:rgba(247,201,72,.7);
+  box-shadow:0 0 20px rgba(247,201,72,.5);
+  animation:legendaryPulse 3s ease-in-out infinite;
+}
+.col-card[data-rar="legendary"] .cc-rar{background:rgba(247,201,72,.35);color:#fff5cc;}
+@keyframes legendaryPulse{
+  0%,100%{box-shadow:0 0 20px rgba(247,201,72,.5);}
+  50%{box-shadow:0 0 32px rgba(247,201,72,.85);}
+}
+.col-card[data-rar="mythic"]{
+  border-color:rgba(255,54,238,.9);
+  --card-glow:rgba(255,54,238,.8);
+  box-shadow:0 0 24px rgba(255,54,238,.6);
+  animation:mythicPulse 2s ease-in-out infinite;
+}
+.col-card[data-rar="mythic"] .cc-rar{background:rgba(255,54,238,.4);color:#ffe0ff;}
+@keyframes mythicPulse{
+  0%,100%{box-shadow:0 0 24px rgba(255,54,238,.6),inset 0 0 12px rgba(54,224,255,.2);}
+  50%{box-shadow:0 0 36px rgba(255,54,238,.95),inset 0 0 20px rgba(54,224,255,.4);}
+}
+
+/* ============ SECRET CHARACTER ============ */
+.secret-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#2a1008 0%,#0a0308 100%);
+  border:1px solid #8a3a1a;
+  position:relative;overflow:hidden;
+}
+.secret-panel.unlocked{
+  background:linear-gradient(135deg,#3a1a08 0%,#1a0a04 100%);
+  border-color:#f7c948;
+  box-shadow:0 0 30px rgba(247,201,72,.4);
+}
+.secret-panel::before{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:70%;height:120%;
+  background:radial-gradient(circle,rgba(255,140,60,.18),transparent 65%);
+  pointer-events:none;
+}
+.secret-panel.unlocked::before{
+  background:radial-gradient(circle,rgba(247,201,72,.3),transparent 65%);
+  animation:secretGlow 3s ease-in-out infinite;
+}
+@keyframes secretGlow{
+  0%,100%{opacity:.6;}
+  50%{opacity:1;}
+}
+.secret-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;
+}
+.secret-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#ff8a1a;
+}
+.secret-panel.unlocked .secret-title{color:#f7c948;}
+.secret-status{
+  font-family:'Unbounded',sans-serif;font-size:10px;font-weight:700;
+  color:#8a3a1a;
+}
+.secret-panel.unlocked .secret-status{color:#f7c948;}
+.secret-row{
+  display:flex;align-items:center;gap:12px;
+}
+.secret-avatar{
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#3a1a08,#1a0a04);
+  border:2px solid #8a3a1a;
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;flex-shrink:0;
+  overflow:hidden;position:relative;
+}
+.secret-panel.unlocked .secret-avatar{
+  border-color:#f7c948;
+  box-shadow:0 0 20px rgba(247,201,72,.5);
+  animation:secretAvatarPulse 2.5s ease-in-out infinite;
+}
+@keyframes secretAvatarPulse{
+  0%,100%{box-shadow:0 0 20px rgba(247,201,72,.5);}
+  50%{box-shadow:0 0 30px rgba(247,201,72,.9);}
+}
+.secret-avatar img{width:100%;height:100%;object-fit:cover;}
+.secret-info{flex:1;min-width:0;}
+.secret-name{
+  font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;
+  color:#ff8a1a;margin-bottom:3px;
+}
+.secret-panel.unlocked .secret-name{color:#f7c948;}
+.secret-desc{
+  font-size:10px;color:#8a5a3a;line-height:1.4;font-weight:600;
+}
+.secret-panel.unlocked .secret-desc{color:#c8a874;}
+.secret-progress{
+  height:6px;border-radius:4px;background:#1a0a04;
+  overflow:hidden;margin-top:8px;
+}
+.secret-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#ff8a1a,#f7c948);
+  box-shadow:0 0 10px rgba(247,201,72,.6);
+  transition:width .3s;
+}
+.secret-panel.unlocked .secret-progress-fill{
+  background:linear-gradient(90deg,#f7c948,#ffe9a8);
+  animation:secretProgressFlow 1.5s linear infinite;
+  background-size:200% 100%;
+}
+@keyframes secretProgressFlow{
+  0%{background-position:0 0;}
+  100%{background-position:200% 0;}
+}
+.secret-meta{
+  display:flex;justify-content:space-between;font-size:10px;
+  color:#8a5a3a;font-weight:700;margin-top:4px;
+  font-family:'Unbounded',sans-serif;
+}
+
+/* ============ ACHIEVEMENT REWARDS (скины) ============ */
+.ach-reward-panel{
+  margin:0 14px 14px;padding:14px;border-radius:14px;
+  background:linear-gradient(135deg,#14202a 0%,#0a1218 100%);
+  border:1px solid #2a4a6a;
+  position:relative;overflow:hidden;
+}
+.ach-reward-panel::before{
+  content:'';position:absolute;top:-40%;right:-20%;
+  width:70%;height:120%;
+  background:radial-gradient(circle,rgba(100,200,255,.1),transparent 65%);
+  pointer-events:none;
+}
+.ach-reward-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;
+}
+.ach-reward-title{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;color:#a8d8e8;
+}
+.ach-reward-count{
+  font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;
+  color:#67c7e8;
+}
+.ach-reward-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.ar-card{
+  aspect-ratio:1;
+  border-radius:12px;
+  background:linear-gradient(180deg,#1a2a3a,#0e1820);
+  border:1px solid #2a4a6a;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;padding:6px;
+  position:relative;overflow:hidden;
+  transition:all .3s;
+}
+.ar-card.locked{
+  filter:grayscale(1);opacity:.4;
+}
+.ar-card.unlocked{
+  filter:none;opacity:1;
+  border-color:#f7c948;
+  box-shadow:0 0 16px rgba(247,201,72,.4);
+  background:linear-gradient(180deg,#2a2010,#1a1208);
+}
+.ar-card .ar-icon{
+  font-size:26px;line-height:1;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+.ar-card .ar-name{
+  font-family:'Manrope',sans-serif;font-weight:800;font-size:8px;
+  color:#a8d8e8;text-align:center;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  width:100%;padding:0 2px;
+}
+.ar-card.unlocked .ar-name{color:#f7c948;}
+.ar-card .ar-lock{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-size:18px;opacity:.6;
+}
+.ar-card.unlocked .ar-lock{display:none;}
 </style>
 </head>
 <body>
@@ -1796,7 +2526,12 @@ body.low-performance .golden-barrel{
 <!-- MODALS & TOASTS -->
 <div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
 <div id="toasts"></div>
+<!-- ПАНЕЛЬ КВЕСТОВ и РУЛЕТКИ (скрыты, показываются в профиле) -->
 
+<!-- МОДАЛКА РУЛЕТКИ (динамическая) -->
+<div class="modal-bg" id="roulette-modal-bg">
+  <div class="modal roulette-modal" id="roulette-modal"></div>
+</div>
 <script>
 /* =========================================================
    ЧАСТЬ 5 — ИГРОВЫЕ ДАННЫЕ
@@ -3025,7 +3760,13 @@ function loop(now){
 function getBuffMult(key){
   let m = 1;
   for (const id in STATE.buffs){
-    if (STATE.buffs[id] > 0 && SNACKS[id]?.eff[key]) m *= SNACKS[id].eff[key];
+    if (STATE.buffs[id] <= 0) continue;
+    // Закуски
+    if (SNACKS[id]?.eff[key]) m *= SNACKS[id].eff[key];
+    // Рулетка-бусты
+    if (id === '__rouletteCoins'  && key === 'coinMult')  m *= 2;
+    if (id === '__rouletteLiters' && key === 'literMult') m *= 2;
+    if (id === '__rouletteAuto'   && key === 'autoMult')  m *= 3;
   }
   return m;
 }
@@ -3636,6 +4377,25 @@ function renderBuffsBar(){
           <span class="btime">${secs}с</span>
         </span>
         <div class="bfill" style="width:${pct}%;background:#f7c948"></div>
+      </div>`;
+    }
+    // Бусты от рулетки — особые
+    if (k === '__rouletteCoins' || k === '__rouletteLiters' || k === '__rouletteAuto'){
+      const names = {
+        '__rouletteCoins':  { ico:'💰', name:'×2 монет',  dur:30000, col:'#7cb342' },
+        '__rouletteLiters': { ico:'⚡', name:'×2 литров', dur:30000, col:'#4a9eff' },
+        '__rouletteAuto':   { ico:'⚙️', name:'×3 авто',   dur:60000, col:'#a566ff' },
+      };
+      const meta = names[k];
+      const secs = Math.ceil(STATE.buffs[k] / 1000);
+      const pct = (STATE.buffs[k] / meta.dur) * 100;
+      return `<div class="buff-chip" style="border-color:${meta.col};box-shadow:0 0 14px ${meta.col}66">
+        <span class="bico">${meta.ico}</span>
+        <span class="binfo">
+          <span class="bdesc" style="color:${meta.col}">${meta.name}</span>
+          <span class="btime">${secs}с</span>
+        </span>
+        <div class="bfill" style="width:${pct}%;background:${meta.col}"></div>
       </div>`;
     }
     const it = SNACKS[k];
@@ -4465,6 +5225,1232 @@ if (!('ontouchstart' in window)){
    🎉 ФИНАЛ
    ========================================================= */
 console.log('%cСобрано из 13 частей · Разработка Gluhoff Digital','color:#8a7f6b;font-size:10px');
+/* =========================================================
+   ЧАСТЬ A2 — ДАННЫЕ КВЕСТОВ, РУЛЕТКИ, ЭФФЕКТОВ, ТЕМ
+   ========================================================= */
+
+/* ===== РАСШИРЕНИЕ STATE (безопасно, не ломает существующие поля) ===== */
+Object.assign(STATE, {
+  // Тема интерфейса
+  theme: 'night',           // night | day | retro | neon
+  // Эффект клика
+  clickFx: 'sparks',        // sparks | drops | coins | hearts | stars
+  // Ежедневные квесты
+  quests: [],               // [{ id, claimed }]
+  questsDay: 0,             // YYYYMMDD — день, для которого сгенерированы квесты
+  // Рулетка
+  rouletteLastSpin: 0,      // timestamp последнего спина
+  rouletteStreak: 0,        // сколько дней подряд спинил
+  // Сегодняшняя статистика — сбрасывается с квестами
+  todayStats: {
+    liters: 0,       // литров набрано сегодня
+    sweetHits: 0,    // попаданий в зелёную сегодня
+    taps: 0,         // глотков сегодня
+    barrels: 0,      // бочек поймано
+    marathons: 0,    // марафонов запущено
+    coins: 0,        // монет заработано
+    purchases: 0,    // покупок сделано
+    prestige: 0,     // престижей сегодня
+  },
+});
+
+/* ===== ОТДЕЛЬНЫЙ СЕЙВ ДЛЯ A2 (чтобы не трогать существующий) ===== */
+const A2_SAVE_KEY = 'beer_baron_a2_v1';
+
+function saveA2(){
+  try{
+    localStorage.setItem(A2_SAVE_KEY, JSON.stringify({
+      theme: STATE.theme,
+      clickFx: STATE.clickFx,
+      quests: STATE.quests,
+      questsDay: STATE.questsDay,
+      rouletteLastSpin: STATE.rouletteLastSpin,
+      rouletteStreak: STATE.rouletteStreak,
+      todayStats: STATE.todayStats,
+    }));
+  }catch(e){}
+}
+
+function loadA2(){
+  try{
+    const raw = localStorage.getItem(A2_SAVE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.theme) STATE.theme = d.theme;
+    if (d.clickFx) STATE.clickFx = d.clickFx;
+    if (Array.isArray(d.quests)) STATE.quests = d.quests;
+    if (d.questsDay) STATE.questsDay = d.questsDay;
+    if (d.rouletteLastSpin) STATE.rouletteLastSpin = d.rouletteLastSpin;
+    if (d.rouletteStreak) STATE.rouletteStreak = d.rouletteStreak;
+    if (d.todayStats && typeof d.todayStats === 'object'){
+      Object.assign(STATE.todayStats, d.todayStats);
+    }
+  }catch(e){}
+}
+loadA2();
+
+// Автосейв A2 — каждые 3 сек
+setInterval(saveA2, 3000);
+
+/* =========================================================
+   📋 ПУЛ КВЕСТОВ
+   ========================================================= */
+const QUEST_POOL = [
+  { id:'liters30',   icon:'🍺', name:'Выпей 30 л',        target:30,    statKey:'liters',    reward:300 },
+  { id:'liters100',  icon:'🛢️', name:'Выпей 100 л',       target:100,   statKey:'liters',    reward:1200 },
+  { id:'liters500',  icon:'🚛', name:'Выпей 500 л',       target:500,   statKey:'liters',    reward:5000 },
+  { id:'sweet20',    icon:'🎯', name:'20 раз в зелёную',  target:20,    statKey:'sweetHits', reward:250 },
+  { id:'sweet75',    icon:'🔥', name:'75 раз в зелёную',  target:75,    statKey:'sweetHits', reward:1000 },
+  { id:'taps200',    icon:'👆', name:'200 глотков',       target:200,   statKey:'taps',      reward:400 },
+  { id:'taps500',    icon:'💪', name:'500 глотков',       target:500,   statKey:'taps',      reward:1500 },
+  { id:'barrels2',   icon:'🛢️', name:'Поймай 2 бочки',    target:2,     statKey:'barrels',   reward:600 },
+  { id:'barrels5',   icon:'🎯', name:'Поймай 5 бочек',    target:5,     statKey:'barrels',   reward:2000 },
+  { id:'marathon3',  icon:'🏃', name:'3 марафона',        target:3,     statKey:'marathons', reward:800 },
+  { id:'coins2000',  icon:'💰', name:'Заработай 2000 ₽',  target:2000,  statKey:'coins',     reward:500 },
+  { id:'coins10000', icon:'💎', name:'Заработай 10000 ₽', target:10000, statKey:'coins',     reward:2500 },
+  { id:'buy5',       icon:'🛒', name:'Купи 5 улучшений',  target:5,     statKey:'purchases', reward:400 },
+  { id:'prestige0',  icon:'⭐', name:'Сделай престиж',    target:1,     statKey:'prestige',  reward:5000 },
+];
+
+/* =========================================================
+   🎰 РУЛЕТКА — 8 СЕКТОРОВ
+   ========================================================= */
+const ROULETTE_PRIZES = [
+  { id:'coins100',     icon:'💰', name:'100 ₽',         type:'coins',   value:100,   weight:30, color:'#f7c948' },
+  { id:'coins500',     icon:'💵', name:'500 ₽',         type:'coins',   value:500,   weight:20, color:'#a566ff' },
+  { id:'coins2000',    icon:'💎', name:'2000 ₽',        type:'coins',   value:2000,  weight:10, color:'#4a9eff' },
+  { id:'buff_coins',   icon:'🔥', name:'×2 монет 30с',  type:'buff',    buff:'__rouletteCoins',  duration:30000, weight:15, color:'#7cb342' },
+  { id:'buff_liters',  icon:'⚡', name:'×2 литров 30с', type:'buff',    buff:'__rouletteLiters', duration:30000, weight:10, color:'#ff8a1a' },
+  { id:'buff_auto',    icon:'⚙️', name:'×3 авто 60с',   type:'buff',    buff:'__rouletteAuto',   duration:60000, weight:8,  color:'#d94343' },
+  { id:'jackpot',      icon:'🎰', name:'ДЖЕКПОТ 10К!',  type:'coins',   value:10000, weight:2,  color:'#c9a8ff' },
+  { id:'nothing',      icon:'😢', name:'Пусто',         type:'nothing', value:0,     weight:5,  color:'#f5a623' },
+];
+
+/* =========================================================
+   ✨ ЭФФЕКТЫ КЛИКА
+   ========================================================= */
+const CLICK_FX = {
+  sparks: { name:'Искры',    icons:['✨','⭐','💫'], color:'#f7c948' },
+  drops:  { name:'Капли',    icons:['💧','🍺','🫧'], color:'#4a9eff' },
+  coins:  { name:'Монеты',   icons:['🪙','💰','💵'], color:'#f7c948' },
+  hearts: { name:'Сердечки', icons:['❤️','💖','💕'], color:'#d94343' },
+  stars:  { name:'Звёзды',   icons:['⭐','🌟','✨'], color:'#f5a623' },
+};
+
+/* =========================================================
+   🎨 ТЕМЫ
+   ========================================================= */
+const THEMES = {
+  night: { name:'Ночь',  icon:'🌙' },
+  day:   { name:'День',  icon:'☀️' },
+  retro: { name:'Ретро', icon:'📺' },
+  neon:  { name:'Неон',  icon:'💜' },
+};
+
+/* =========================================================
+   🛠 ХЕЛПЕРЫ
+   ========================================================= */
+function getTodayKey(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return parseInt(y + m + day, 10);
+}
+
+function getQuestById(id){
+  return QUEST_POOL.find(q => q.id === id);
+}
+
+/* Генерация квестов на сегодня */
+function ensureQuestsToday(){
+  const today = getTodayKey();
+  if (STATE.questsDay === today && STATE.quests.length === 3) return;
+
+  // Фильтруем квесты по доступности
+  const available = QUEST_POOL.filter(q => {
+    if (q.id === 'prestige0')  return STATE.best >= 3000;
+    if (q.id === 'liters500')  return STATE.best >= 100;
+    if (q.id === 'liters100')  return STATE.best >= 30;
+    if (q.id === 'coins10000') return STATE.totalCoins >= 3000;
+    if (q.id === 'sweet75')    return STATE.best >= 50;
+    if (q.id === 'taps500')    return STATE.best >= 30;
+    if (q.id === 'marathon3')  return STATE.maxCombo >= 5;
+    if (q.id === 'barrels5')   return STATE.best >= 200;
+    return true;
+  });
+
+  // Выбираем 3 случайных без повторов
+  const picked = [];
+  const pool = [...available];
+  while (picked.length < 3 && pool.length > 0){
+    const idx = Math.floor(Math.random() * pool.length);
+    picked.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+
+  STATE.quests = picked.map(q => ({ id: q.id, claimed: false }));
+  STATE.questsDay = today;
+
+  // Сброс дневной статистики
+  STATE.todayStats = {
+    liters: 0,
+    sweetHits: 0,
+    taps: 0,
+    barrels: 0,
+    marathons: 0,
+    coins: 0,
+    purchases: 0,
+    prestige: 0,
+  };
+
+  saveA2();
+}
+
+/* Проверка, можно ли крутить рулетку */
+function canSpinRoulette(){
+  if (STATE.rouletteLastSpin === 0) return true;
+  return (Date.now() - STATE.rouletteLastSpin) >= DAY_MS;
+}
+
+/* Применение темы */
+function applyTheme(themeId){
+  const valid = ['night','day','retro','neon'];
+  if (!valid.includes(themeId)) themeId = 'night';
+  STATE.theme = themeId;
+  if (themeId === 'night'){
+    document.body.removeAttribute('data-theme');
+  } else {
+    document.body.setAttribute('data-theme', themeId);
+  }
+  saveA2();
+}
+
+/* Инициализация A2 */
+ensureQuestsToday();
+applyTheme(STATE.theme);
+
+console.log(
+  '%c📦 A2 загружен: квесты, рулетка, темы, эффекты',
+  'background:linear-gradient(135deg,#a566ff,#4a9eff);color:#fff;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:11px'
+);
+/* =========================================================
+   ЧАСТЬ B2 — ДАННЫЕ КОЛЛЕКЦИИ, СЕКРЕТНОГО ПЕРСОНАЖА, СКИНОВ
+   ========================================================= */
+
+/* ===== РЕДКОСТИ ===== */
+const RARITIES = {
+  common:    { name:'Обычный',      color:'#8a7f6b', order:1 },
+  rare:      { name:'Редкий',       color:'#4a9eff', order:2 },
+  epic:      { name:'Эпический',    color:'#a566ff', order:3 },
+  legendary: { name:'Легендарный',  color:'#f7c948', order:4 },
+  mythic:    { name:'Мифический',   color:'#ff36ee', order:5 },
+};
+
+/* ===== РЕДКОСТЬ СОРТОВ ПИВА ===== */
+const BEER_RARITY = {
+  zhigul:  'common',
+  baltika: 'common',
+  klinsk:  'common',
+  troe:    'rare',
+  razliv:  'rare',
+  ohota:   'epic',
+  german:  'epic',
+  czech:   'legendary',
+  belg:    'legendary',
+  ipa:     'mythic',
+};
+
+/* ===== РЕДКОСТЬ БОКАЛОВ ===== */
+const MUG_RARITY = {
+  glass: 'common',
+  mug05: 'common',
+  mug10: 'rare',
+  oak:   'epic',
+  horn:  'legendary',
+  skull: 'mythic',
+};
+
+/* ===== РЕДКОСТЬ ОБРАЗОВ ===== */
+const SKIN_RARITY = {
+  hoodie:  'common',
+  cap:     'common',
+  leather: 'rare',
+  gopnik:  'epic',
+  specnaz: 'legendary',
+  king:    'mythic',
+};
+
+/* ===== СЕКРЕТНЫЙ ПЕРСОНАЖ ===== */
+const SECRET_CHAR = {
+  id: 'secret',
+  name: '???',           // откроется настоящее имя после разблокировки
+  revealedName: 'Тайный Барон',
+  emoji: '🎩',
+  color: '#f7c948',
+  bio: 'Легенда всех баров. Никто не знает его настоящее имя — только слухи.',
+  unlockedBio: 'Он появляется там, где наливают лучшее пиво. Говорят, он выпил 10 000 литров и стал бессмертным.',
+  requiredLiters: 10000,
+  photos: { idle:'', drinking:'' },
+};
+
+/* Проверка: разблокирован ли секретный персонаж */
+function isSecretUnlocked(){
+  return STATE.best >= SECRET_CHAR.requiredLiters;
+}
+
+/* Возвращает правильное имя — с раскрытием или нет */
+function getSecretName(){
+  return isSecretUnlocked() ? SECRET_CHAR.revealedName : SECRET_CHAR.name;
+}
+
+/* ===== ЭКСКЛЮЗИВНЫЕ СКИНЫ ЗА АЧИВКИ ===== */
+/* Каждый скин = уникальный бокал, который надевается на персонажа */
+const ACH_REWARD_SKINS = [
+  {
+    id: 'cup_copper',
+    achId: 'bucket',
+    name: 'Медный кубок',
+    icon: '🥉',
+    type: 'mug_skin',
+    color: '#cd7f32',
+    desc: 'За выпитые 10 литров',
+  },
+  {
+    id: 'cup_silver',
+    achId: 'barrel',
+    name: 'Серебряная кружка',
+    icon: '🥈',
+    type: 'mug_skin',
+    color: '#c0c0c0',
+    desc: 'За выпитые 100 литров',
+  },
+  {
+    id: 'cup_gold',
+    achId: 'tank',
+    name: 'Золотая кружка',
+    icon: '🥇',
+    type: 'mug_skin',
+    color: '#f7c948',
+    desc: 'За выпитые 1000 литров',
+  },
+  {
+    id: 'cup_diamond',
+    achId: 'tycoon',
+    name: 'Алмазный трон',
+    icon: '💎',
+    type: 'mug_skin',
+    color: '#4a9eff',
+    desc: 'За 100 000 ₽',
+  },
+  {
+    id: 'cup_combo',
+    achId: 'combo',
+    name: 'Кубок Потока',
+    icon: '🔥',
+    type: 'mug_skin',
+    color: '#ff8a1a',
+    desc: 'За комбо ×5',
+  },
+  {
+    id: 'cup_prestige',
+    achId: 'prestige1',
+    name: 'Кубок Барона',
+    icon: '⭐',
+    type: 'mug_skin',
+    color: '#a566ff',
+    desc: 'За первый престиж',
+  },
+];
+
+/* Проверка, получен ли скин */
+function isAchSkinUnlocked(skinId){
+  const skin = ACH_REWARD_SKINS.find(s => s.id === skinId);
+  if (!skin) return false;
+  return STATE.achievements.includes(skin.achId);
+}
+
+/* Считаем сколько скинов получено */
+function countAchSkinsUnlocked(){
+  return ACH_REWARD_SKINS.filter(s => isAchSkinUnlocked(s.id)).length;
+}
+
+/* ===== РАСШИРЕНИЕ STATE ДЛЯ B ===== */
+Object.assign(STATE, {
+  // Надетый скин-кубок (id из ACH_REWARD_SKINS или null)
+  equippedAchSkin: null,
+  // Секретный персонаж выбран?
+  usingSecret: false,
+});
+
+/* ===== СЕЙВ B ===== */
+const B_SAVE_KEY = 'beer_baron_b_v1';
+
+function saveB(){
+  try{
+    localStorage.setItem(B_SAVE_KEY, JSON.stringify({
+      equippedAchSkin: STATE.equippedAchSkin,
+      usingSecret: STATE.usingSecret,
+    }));
+  }catch(e){}
+}
+
+function loadB(){
+  try{
+    const raw = localStorage.getItem(B_SAVE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.equippedAchSkin) STATE.equippedAchSkin = d.equippedAchSkin;
+    if (d.usingSecret) STATE.usingSecret = !!d.usingSecret;
+  }catch(e){}
+}
+loadB();
+
+// Автосейв B
+setInterval(saveB, 3000);
+
+console.log(
+  '%c💎 B2 загружен: редкости, секретный персонаж, скины',
+  'background:linear-gradient(135deg,#f7c948,#ff36ee);color:#fff;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:11px'
+);
+/* =========================================================
+   ЧАСТЬ A3 — РЕНДЕР ПАНЕЛЕЙ + ЛОГИКА КВЕСТОВ/РУЛЕТКИ/ТЕМ
+   ========================================================= */
+
+/* =========================================================
+   📊 МОНТАЖ ПАНЕЛЕЙ В ПРОФИЛЬ
+   ========================================================= */
+function mountPanels(){
+  const profileScreen = document.getElementById('screen-profile');
+  if (!profileScreen) return;
+  const profActions = profileScreen.querySelector('.prof-actions');
+  if (!profActions) return;
+
+  // Создаём контейнеры, если их нет
+  const ensure = (id, html) => {
+    let el = document.getElementById(id);
+    if (!el){
+      el = document.createElement('div');
+      el.id = id;
+      profActions.parentNode.insertBefore(el, profActions);
+    }
+    return el;
+  };
+
+  ensure('quests-mount-el');
+  ensure('roulette-mount-el');
+  ensure('settings-mount-el');
+}
+
+// Монтируем сразу и с задержкой (на случай, если DOM ещё не готов)
+mountPanels();
+setTimeout(mountPanels, 500);
+
+/* =========================================================
+   📋 РЕНДЕР КВЕСТОВ
+   ========================================================= */
+function renderQuestsPanel(){
+  const mount = document.getElementById('quests-mount-el');
+  if (!mount) return;
+
+  ensureQuestsToday();
+
+  // Проверяем, все ли claimed
+  const allClaimed = STATE.quests.every(q => q.claimed);
+
+  // Таймер до сброса (до 00:00 следующего дня)
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 0, 0);
+  const msLeft = tomorrow - now;
+  const hh = Math.floor(msLeft / 3600000);
+  const mm = Math.floor((msLeft % 3600000) / 60000);
+  const timerText = `${hh}ч ${mm}м`;
+
+  let html = `<div class="quests-panel">
+    <div class="quests-head">
+      <span class="quests-title">📋 Задания дня</span>
+      <span class="quests-timer">⏰ ${timerText}</span>
+    </div>`;
+
+  for (const q of STATE.quests){
+    const def = getQuestById(q.id);
+    if (!def) continue;
+    const stat = STATE.todayStats[def.statKey] || 0;
+    const done = stat >= def.target;
+    const pct = Math.min(100, (stat / def.target) * 100);
+    const claimed = q.claimed;
+
+    const btnText = claimed ? '✓' : (done ? 'Забрать' : `${stat}/${def.target}`);
+    const btnDis = claimed || !done ? 'disabled' : '';
+
+    html += `
+      <div class="quest-item ${done ? 'done' : ''} ${claimed ? 'claimed' : ''}">
+        <div class="quest-icon">${def.icon}</div>
+        <div class="quest-info">
+          <div class="quest-name">${def.name}</div>
+          <div class="quest-progress">
+            <div class="quest-progress-fill" style="width:${pct}%"></div>
+          </div>
+          <div class="quest-meta">
+            <span>${claimed ? 'Получено' : (done ? 'Готово!' : `${Math.floor(stat)} / ${def.target}`)}</span>
+            <span class="quest-reward">+${def.reward} ₽</span>
+          </div>
+        </div>
+        <button class="btn-quest" ${btnDis} onclick="claimQuest('${q.id}')">${btnText}</button>
+      </div>`;
+  }
+
+  html += `</div>`;
+  mount.innerHTML = html;
+}
+
+window.claimQuest = (id) => {
+  const q = STATE.quests.find(x => x.id === id);
+  if (!q || q.claimed) return;
+  const def = getQuestById(id);
+  if (!def) return;
+  const stat = STATE.todayStats[def.statKey] || 0;
+  if (stat < def.target){ haptic('error'); return; }
+
+  q.claimed = true;
+  STATE.coins += def.reward;
+  STATE.totalCoins += def.reward;
+
+  haptic('success');
+  playReward();
+  showToast('📋 Задание выполнено!', '+' + def.reward.toLocaleString('ru-RU') + ' ₽');
+
+  // Анимация на кнопке
+  const btn = document.querySelector(`.btn-quest[onclick*="${id}"]`);
+  if (btn){
+    btn.classList.add('done-anim');
+    setTimeout(() => btn.classList.remove('done-anim'), 600);
+  }
+
+  saveA2();
+  save();
+  renderQuestsPanel();
+};
+
+/* =========================================================
+   🎰 РЕНДЕР РУЛЕТКИ
+   ========================================================= */
+function renderRoulettePanel(){
+  const mount = document.getElementById('roulette-mount-el');
+  if (!mount) return;
+
+  const can = canSpinRoulette();
+  const streakTxt = STATE.rouletteStreak > 0 ? `Стрик: ${STATE.rouletteStreak} дн.` : '';
+
+  mount.innerHTML = `
+    <div class="roulette-panel">
+      <div class="roulette-head">
+        <span class="roulette-title">🎰 Рулетка удачи</span>
+        <span class="roulette-status">${streakTxt}</span>
+      </div>
+      <div class="roulette-icon-row">
+        <span>💰</span><span>💵</span><span>💎</span><span>🔥</span>
+        <span>⚡</span><span>⚙️</span><span>🎰</span><span>😢</span>
+      </div>
+      <button class="btn-roulette" id="btn-roulette" onclick="openRoulette()" ${can ? '' : 'disabled'}>
+        ${can ? 'Крутить!' : 'Приходи завтра'}
+      </button>
+    </div>`;
+}
+
+/* =========================================================
+   🎰 МОДАЛКА РУЛЕТКИ + СПИН
+   ========================================================= */
+window.openRoulette = () => {
+  if (!canSpinRoulette()) return;
+  haptic('light');
+
+  // Собираем колесо
+  const wheelItems = ROULETTE_PRIZES.map((p, i) => {
+    const angle = i * 45 + 22.5; // центр сектора
+    const rad = (angle - 90) * Math.PI / 180;
+    const r = 92; // радиус до иконки
+    const x = Math.cos(rad) * r;
+    const y = Math.sin(rad) * r;
+    return `<div class="roulette-wheel-item" style="transform:translate(${x}px,${y}px) translate(-50%,-50%)">${p.icon}</div>`;
+  }).join('');
+
+  const modal = document.getElementById('roulette-modal');
+  modal.innerHTML = `
+    <div class="modal-title">🎰 Рулетка удачи</div>
+    <div class="roulette-wheel-wrap">
+      <div class="roulette-pointer"></div>
+      <div class="roulette-wheel" id="roulette-wheel">
+        ${wheelItems}
+        <div class="roulette-center">КРУТИ</div>
+      </div>
+    </div>
+    <div class="roulette-result" id="roulette-result">
+      <div class="rr-title" style="color:#a89468">Нажми, чтобы крутить</div>
+    </div>
+    <div class="modal-buttons">
+      <button class="cancel" onclick="closeRoulette()">Закрыть</button>
+      <button class="confirm" id="btn-spin-now" onclick="spinRoulette()">КРУТИТЬ</button>
+    </div>`;
+
+  document.getElementById('roulette-modal-bg').classList.add('on');
+  attachRippleAll();
+};
+
+window.closeRoulette = () => {
+  document.getElementById('roulette-modal-bg').classList.remove('on');
+};
+
+let rouletteSpinning = false;
+
+window.spinRoulette = () => {
+  if (rouletteSpinning) return;
+  if (!canSpinRoulette()) return;
+
+  const wheel = document.getElementById('roulette-wheel');
+  const btn = document.getElementById('btn-spin-now');
+  const resultEl = document.getElementById('roulette-result');
+  if (!wheel) return;
+
+  rouletteSpinning = true;
+  if (btn) btn.disabled = true;
+
+  // Выбираем приз по весам
+  const totalWeight = ROULETTE_PRIZES.reduce((s, p) => s + p.weight, 0);
+  let r = Math.random() * totalWeight;
+  let prizeIdx = 0;
+  for (let i = 0; i < ROULETTE_PRIZES.length; i++){
+    r -= ROULETTE_PRIZES[i].weight;
+    if (r <= 0){ prizeIdx = i; break; }
+  }
+  const prize = ROULETTE_PRIZES[prizeIdx];
+
+  // Угол поворота
+  const targetAngle = prizeIdx * 45 + 22.5;
+  const fullSpins = 5 + Math.floor(Math.random() * 3);
+  const totalRotation = fullSpins * 360 - targetAngle + (Math.random() * 20 - 10);
+
+  // Показываем процесс
+  resultEl.innerHTML = `<div class="rr-title" style="color:#a89468">Крутим…</div>`;
+  wheel.classList.add('spinning');
+
+  // Фиксируем начальное значение, чтобы каждый спин был новым
+  wheel.style.transition = 'transform 4s cubic-bezier(.17,.67,.3,1)';
+  wheel.style.transform = `rotate(0deg)`;
+
+  // Форсируем reflow
+  void wheel.offsetWidth;
+
+  // Запускаем анимацию
+  requestAnimationFrame(() => {
+    wheel.style.transform = `rotate(${totalRotation}deg)`;
+  });
+
+  haptic('medium');
+  playBarrel();
+
+  setTimeout(() => {
+    wheel.classList.remove('spinning');
+    applyRoulettePrize(prize);
+
+    // Сохраняем старый last spin ДО обновления
+    const prevSpin = STATE.rouletteLastSpin;
+    STATE.rouletteLastSpin = Date.now();
+
+    if (prevSpin === 0){
+      STATE.rouletteStreak = 1;
+    } else {
+      const sinceLast = STATE.rouletteLastSpin - prevSpin;
+      if (sinceLast < DAY_MS * 2){
+        STATE.rouletteStreak = Math.min(30, STATE.rouletteStreak + 1);
+      } else {
+        STATE.rouletteStreak = 1;
+      }
+    }
+    saveA2();
+
+    // Показываем результат
+    resultEl.innerHTML = `
+      <span class="rr-icon">${prize.icon}</span>
+      <div class="rr-title">${prize.name}</div>
+      <div class="rr-sub">${prize.type === 'coins' ? 'Зачислено на баланс' : prize.type === 'buff' ? 'Активирован буст' : 'Повезёт в следующий раз'}</div>`;
+
+    haptic('success');
+    playReward();
+
+    rouletteSpinning = false;
+    if (btn){
+      btn.disabled = true;
+      btn.innerText = 'Готово';
+    }
+    renderRoulettePanel();
+  }, 4200);
+};
+
+function applyRoulettePrize(prize){
+  if (!prize) return;
+
+  if (prize.type === 'coins'){
+    STATE.coins += prize.value;
+    STATE.totalCoins += prize.value;
+    showToast(prize.icon + ' ' + prize.name, '+' + prize.value.toLocaleString('ru-RU') + ' ₽');
+    save();
+  } else if (prize.type === 'buff'){
+    STATE.buffs[prize.buff] = (STATE.buffs[prize.buff] || 0) + prize.duration;
+    showToast(prize.icon + ' ' + prize.name, Math.round(prize.duration / 1000) + 'с');
+    if (typeof renderBuffsBar === 'function') renderBuffsBar();
+  } else {
+    showToast(prize.icon + ' ' + prize.name, 'В другой раз повезёт!');
+  }
+}
+
+/* =========================================================
+   ⚙️ РЕНДЕР НАСТРОЕК (ТЕМА + ЭФФЕКТ КЛИКА)
+   ========================================================= */
+function renderSettingsPanel(){
+  const mount = document.getElementById('settings-mount-el');
+  if (!mount) return;
+
+  const themeHtml = Object.keys(THEMES).map(k => {
+    const t = THEMES[k];
+    const active = STATE.theme === k ? 'active' : '';
+    return `<button class="theme-btn ${active}" onclick="setTheme('${k}')">
+      <span class="ico">${t.icon}</span>
+      <span>${t.name}</span>
+    </button>`;
+  }).join('');
+
+  const fxHtml = Object.keys(CLICK_FX).map(k => {
+    const f = CLICK_FX[k];
+    const active = STATE.clickFx === k ? 'active' : '';
+    return `<button class="click-fx-btn ${active}" onclick="setClickFx('${k}')">
+      <span class="ico">${f.icons[0]}</span>
+      <span>${f.name}</span>
+    </button>`;
+  }).join('');
+
+  mount.innerHTML = `
+    <div class="settings-panel">
+      <div class="settings-head">
+        <span>⚙️ Настройки</span>
+      </div>
+      <div class="settings-section-title">🎨 Тема интерфейса</div>
+      <div class="settings-row">${themeHtml}</div>
+      <div class="settings-section-title" style="margin-top:14px">✨ Эффект при клике</div>
+      <div class="settings-row">${fxHtml}</div>
+    </div>`;
+
+  attachRippleAll();
+}
+
+window.setTheme = (id) => {
+  applyTheme(id);
+  haptic('medium');
+  renderSettingsPanel();
+  showToast('🎨 Тема: ' + (THEMES[id]?.name || id), 'Интерфейс обновлён');
+};
+
+window.setClickFx = (id) => {
+  STATE.clickFx = id;
+  saveA2();
+  haptic('medium');
+  renderSettingsPanel();
+  showToast('✨ Эффект: ' + (CLICK_FX[id]?.name || id), 'Попробуй зажать экран');
+};
+
+/* =========================================================
+   ✨ ЭФФЕКТ КЛИКА — ЧАСТИЦЫ
+   ========================================================= */
+function spawnClickFx(x, y){
+  if (document.body.classList.contains('low-performance')) return;
+  const fx = CLICK_FX[STATE.clickFx];
+  if (!fx) return;
+
+  const count = 3 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < count; i++){
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'click-fx-particle';
+      const icon = fx.icons[Math.floor(Math.random() * fx.icons.length)];
+      el.innerText = icon;
+      el.style.left = (x + (Math.random() - 0.5) * 40) + 'px';
+      el.style.top  = (y + (Math.random() - 0.5) * 40) + 'px';
+      el.style.fontSize = (16 + Math.random() * 12).toFixed(0) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1100);
+    }, i * 60);
+  }
+}
+
+/* Вешаем обработчик на игровой стейдж */
+(function setupClickFx(){
+  const stg = document.getElementById('stage');
+  if (!stg) return;
+  stg.addEventListener('pointerdown', (e) => {
+    spawnClickFx(e.clientX, e.clientY);
+  }, { passive: true });
+})();
+
+/* =========================================================
+   📈 ТРЕКИНГ ДНЕВНОЙ СТАТИСТИКИ (для квестов)
+   ========================================================= */
+let a3Prev = {
+  liters: 0,
+  totalCoins: 0,
+  pressing: false,
+  chug: 0,
+  marathonEnd: 0,
+  barrelBuff: 0,
+  prestige: 0,
+};
+
+function trackDailyStats(){
+  if (!STATE.todayStats) return;
+
+  // Литры — разница
+  const litDiff = STATE.liters - a3Prev.liters;
+  if (litDiff > 0) STATE.todayStats.liters += litDiff;
+  a3Prev.liters = STATE.liters;
+
+  // Монеты — разница
+  const coinDiff = STATE.totalCoins - a3Prev.totalCoins;
+  if (coinDiff > 0) STATE.todayStats.coins += coinDiff;
+  a3Prev.totalCoins = STATE.totalCoins;
+
+  // Начало нового глотка
+  if (!a3Prev.pressing && STATE.pressing){
+    STATE.todayStats.taps++;
+  }
+  a3Prev.pressing = STATE.pressing;
+
+  // Вход в зелёную зону (переход через 40)
+  const prevChug = a3Prev.chug;
+  const curChug  = STATE.chug;
+  if (prevChug < 40 && curChug >= 40 && curChug <= 75){
+    STATE.todayStats.sweetHits++;
+  }
+  a3Prev.chug = curChug;
+
+  // Марафон
+  if (STATE.marathonEndAt !== a3Prev.marathonEnd){
+    if (STATE.marathonEndAt > 0) STATE.todayStats.marathons++;
+    a3Prev.marathonEnd = STATE.marathonEndAt;
+  }
+
+  // Бочка поймана
+  const curBarrel = STATE.buffs['__barrel'] || 0;
+  if (a3Prev.barrelBuff <= 0 && curBarrel > 0){
+    STATE.todayStats.barrels++;
+  }
+  a3Prev.barrelBuff = curBarrel;
+
+  // Престиж
+  if (STATE.prestige !== a3Prev.prestige){
+    if (STATE.prestige > a3Prev.prestige){
+      STATE.todayStats.prestige += (STATE.prestige - a3Prev.prestige);
+    }
+    a3Prev.prestige = STATE.prestige;
+  }
+}
+
+// Инициализируем baseline
+a3Prev.liters = STATE.liters;
+a3Prev.totalCoins = STATE.totalCoins;
+a3Prev.prestige = STATE.prestige;
+
+setInterval(trackDailyStats, 250);
+
+/* =========================================================
+   🛒 ОБЁРТКА ПОКУПОК — считаем purchases
+   ========================================================= */
+(function wrapBuyFuncs(){
+  const _buy = window.buy;
+  const _buyAuto = window.buyAuto;
+  const _buySnack = window.buySnack;
+
+  window.buy = (type, id) => {
+    const before = STATE.coins;
+    _buy(type, id);
+    if (STATE.coins < before) STATE.todayStats.purchases++;
+  };
+
+  window.buyAuto = (id) => {
+    const before = STATE.coins;
+    _buyAuto(id);
+    if (STATE.coins < before) STATE.todayStats.purchases++;
+  };
+
+  window.buySnack = (id) => {
+    const before = STATE.coins;
+    _buySnack(id);
+    if (STATE.coins < before) STATE.todayStats.purchases++;
+  };
+})();
+
+/* =========================================================
+   🎨 ОБНОВЛЕНИЕ ПАНЕЛЕЙ В ПРОФИЛЕ
+   ========================================================= */
+function refreshA3Panels(){
+  const profileActive = document.getElementById('screen-profile').classList.contains('active');
+  if (!profileActive) return;
+  const appHidden = document.getElementById('app').classList.contains('hidden');
+  if (appHidden) return;
+
+  renderQuestsPanel();
+  renderRoulettePanel();
+  renderSettingsPanel();
+}
+
+// Первый рендер
+setTimeout(refreshA3Panels, 300);
+
+// Обновляем панели когда открыт профиль — раз в 1.5 сек
+setInterval(refreshA3Panels, 1500);
+
+// Обновляем панели при переключении на вкладку профиль
+(function hookProfileTab(){
+  const profileBtn = document.querySelector('.tabbar button[data-tab="profile"]');
+  if (!profileBtn) return;
+  profileBtn.addEventListener('click', () => {
+    setTimeout(refreshA3Panels, 100);
+  });
+})();
+
+/* =========================================================
+   🎁 РАЗБЛОКИРОВКА БОЧКИ (если буст __rouletteCoins активен)
+   ========================================================= */
+// (встроено в tick через getBuffMult, ничего делать не надо — 
+//  но проверим, что буст реально работает: добавим multiplier в tick)
+
+/* =========================================================
+   🎉 ФИНАЛ A3
+   ========================================================= */
+console.log(
+  '%c✅ Пачка A загружена: квесты, рулетка, темы, эффекты',
+  'background:linear-gradient(135deg,#7cb342,#f7c948);color:#1a1005;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:12px'
+);
+/* =========================================================
+   ЧАСТЬ B3 — РЕНДЕР + ЛОГИКА КОЛЛЕКЦИИ, СЕКРЕТА, СКИНОВ
+   ========================================================= */
+
+/* ===== МОНТАЖ 3 НОВЫХ ПАНЕЛЕЙ В ПРОФИЛЬ ===== */
+function mountBPanels(){
+  const profileScreen = document.getElementById('screen-profile');
+  if (!profileScreen) return;
+  const profActions = profileScreen.querySelector('.prof-actions');
+  if (!profActions) return;
+
+  const ensure = (id) => {
+    let el = document.getElementById(id);
+    if (!el){
+      el = document.createElement('div');
+      el.id = id;
+      profActions.parentNode.insertBefore(el, profActions);
+    }
+    return el;
+  };
+
+  ensure('collection-mount-el');
+  ensure('secret-mount-el');
+  ensure('ach-reward-mount-el');
+}
+mountBPanels();
+setTimeout(mountBPanels, 500);
+
+/* =========================================================
+   📚 КОЛЛЕКЦИЯ СОРТОВ
+   ========================================================= */
+function renderCollectionPanel(){
+  const mount = document.getElementById('collection-mount-el');
+  if (!mount) return;
+
+  const beers = Object.keys(BEERS).map(k => ({
+    key: k,
+    name: BEERS[k].name,
+    icon: BEERS[k].icon,
+    owned: BEERS[k].owned,
+    rar: BEER_RARITY[k] || 'common',
+  }));
+
+  const unlocked = beers.filter(b => b.owned).length;
+  const total = beers.length;
+
+  let html = `<div class="collection-panel">
+    <div class="collection-head">
+      <span class="collection-title">📚 Коллекция сортов</span>
+      <span class="collection-count">${unlocked} / ${total}</span>
+    </div>
+    <div class="collection-grid">`;
+
+  for (const b of beers){
+    const rarName = RARITIES[b.rar]?.name || 'Обычный';
+    html += `<div class="col-card ${b.owned?'unlocked':'locked'}" data-rar="${b.rar}">
+      <span class="cc-rar">${rarName.slice(0, 4)}</span>
+      <span class="cc-icon">${b.owned ? b.icon : '❓'}</span>
+      <span class="cc-name">${b.owned ? b.name : '???'}</span>
+    </div>`;
+  }
+
+  html += `</div></div>`;
+  mount.innerHTML = html;
+}
+
+/* =========================================================
+   🎩 СЕКРЕТНЫЙ ПЕРСОНАЖ
+   ========================================================= */
+function renderSecretPanel(){
+  const mount = document.getElementById('secret-mount-el');
+  if (!mount) return;
+
+  const unlocked = isSecretUnlocked();
+  const progress = Math.min(100, (STATE.best / SECRET_CHAR.requiredLiters) * 100);
+  const remaining = Math.max(0, SECRET_CHAR.requiredLiters - STATE.best);
+
+  let html = `<div class="secret-panel ${unlocked?'unlocked':''}">
+    <div class="secret-head">
+      <span class="secret-title">${unlocked ? '🎩 Открыт' : '🔒 Секрет'}</span>
+      <span class="secret-status">${unlocked ? 'Разблокирован' : 'Закрыт'}</span>
+    </div>
+    <div class="secret-row">
+      <div class="secret-avatar">${unlocked ? SECRET_CHAR.emoji : '❓'}</div>
+      <div class="secret-info">
+        <div class="secret-name">${unlocked ? SECRET_CHAR.revealedName : '???'}</div>
+        <div class="secret-desc">${unlocked ? SECRET_CHAR.unlockedBio : 'Легендарный барон откроется на 10 000 литров'}</div>
+      </div>
+    </div>`;
+
+  if (!unlocked){
+    html += `
+      <div class="secret-progress"><div class="secret-progress-fill" style="width:${progress}%"></div></div>
+      <div class="secret-meta">
+        <span>${STATE.best.toFixed(0)} / ${SECRET_CHAR.requiredLiters.toLocaleString('ru-RU')} л</span>
+        <span>${remaining.toFixed(0)} л до открытия</span>
+      </div>`;
+  } else {
+    const isCurrent = STATE.charId === 'secret';
+    html += `<button class="btn-action" style="margin-top:12px" onclick="selectSecret()" ${isCurrent?'disabled style="opacity:.6"':''}>
+      ${isCurrent ? '✓ Выбран' : '🎩 Играть за ' + SECRET_CHAR.revealedName}
+    </button>`;
+  }
+
+  html += `</div>`;
+  mount.innerHTML = html;
+}
+
+/* =========================================================
+   🏆 СКИНЫ ЗА АЧИВКИ
+   ========================================================= */
+function renderAchRewardPanel(){
+  const mount = document.getElementById('ach-reward-mount-el');
+  if (!mount) return;
+
+  const unlocked = countAchSkinsUnlocked();
+  const total = ACH_REWARD_SKINS.length;
+
+  let html = `<div class="ach-reward-panel">
+    <div class="ach-reward-head">
+      <span class="ach-reward-title">🏆 Награды за ачивки</span>
+      <span class="ach-reward-count">${unlocked} / ${total}</span>
+    </div>
+    <div class="ach-reward-grid">`;
+
+  for (const s of ACH_REWARD_SKINS){
+    const has = isAchSkinUnlocked(s.id);
+    const active = STATE.equippedAchSkin === s.id;
+    const click = has ? `onclick="equipAchSkin('${s.id}')"` : '';
+    const activeStyle = active ? 'box-shadow:0 0 24px rgba(247,201,72,.9);border-color:#fff;transform:scale(1.05);' : '';
+    html += `<div class="ar-card ${has?'unlocked':'locked'}" 
+      ${click}
+      title="${has ? s.desc : 'Не открыт'}"
+      style="${activeStyle}">
+      <span class="ar-icon">${s.icon}</span>
+      <span class="ar-name">${has ? s.name : '???'}</span>
+      ${!has ? `<span class="ar-lock">🔒</span>` : ''}
+    </div>`;
+  }
+
+  html += `</div>`;
+
+  if (STATE.equippedAchSkin){
+    const s = ACH_REWARD_SKINS.find(x => x.id === STATE.equippedAchSkin);
+    html += `<button class="btn-action" style="margin-top:10px" onclick="equipAchSkin(null)">
+      Снять ${s ? s.icon + ' ' + s.name : ''}
+    </button>`;
+  }
+
+  html += `</div>`;
+  mount.innerHTML = html;
+}
+
+/* =========================================================
+   🎩 ВЫБОР СЕКРЕТНОГО ПЕРСОНАЖА
+   ========================================================= */
+window.selectSecret = () => {
+  if (!isSecretUnlocked()) return;
+
+  ensureSecretInCharacters();
+
+  STATE.charId = 'secret';
+  STATE.usingSecret = true;
+  save();
+  saveB();
+  haptic('success');
+  playReward();
+  refreshTopbar();
+  renderProfile();
+  showToast('🎩 Тайный Барон выбран', 'Уникальный персонаж с историей');
+};
+
+function ensureSecretInCharacters(){
+  if (CHARACTERS.find(c => c.id === 'secret')) return;
+  CHARACTERS.push({
+    id: SECRET_CHAR.id,
+    name: SECRET_CHAR.revealedName,
+    emoji: SECRET_CHAR.emoji,
+    color: SECRET_CHAR.color,
+    bio: SECRET_CHAR.unlockedBio,
+    photos: SECRET_CHAR.photos,
+  });
+}
+
+// Если при загрузке секрет уже разблокирован — сразу добавляем
+if (isSecretUnlocked()) ensureSecretInCharacters();
+
+/* Проверка разблокировки секрета во время игры */
+let secretAnnounced = false;
+function checkSecretUnlock(){
+  if (secretAnnounced) return;
+  if (!isSecretUnlocked()) return;
+  secretAnnounced = true;
+  ensureSecretInCharacters();
+  haptic('success');
+  playReward();
+  showToast('🎩 СЕКРЕТНЫЙ ПЕРСОНАЖ ОТКРЫТ!', 'Тайный Барон доступен в профиле');
+
+  // Салют из частиц
+  const appEl = document.getElementById('app');
+  if (appEl){
+    const r = appEl.getBoundingClientRect();
+    for (let i = 0; i < 5; i++){
+      setTimeout(() => spawnParticles(
+        r.left + Math.random() * r.width,
+        r.top + r.height * 0.3 + Math.random() * 100,
+        '#f7c948',
+        12
+      ), i * 150);
+    }
+  }
+}
+
+setInterval(checkSecretUnlock, 2000);
+
+/* =========================================================
+   🏆 НАДЕВАНИЕ СКИНА-КУБКА
+   ========================================================= */
+window.equipAchSkin = (id) => {
+  if (id !== null && !isAchSkinUnlocked(id)) return;
+
+  STATE.equippedAchSkin = id;
+  saveB();
+  haptic('medium');
+  renderAchRewardPanel();
+  updateMugSkinDisplay();
+
+  if (id){
+    const s = ACH_REWARD_SKINS.find(x => x.id === id);
+    if (s) showToast(s.icon + ' ' + s.name, 'Кубок надет');
+  } else {
+    showToast('Кубок снят', 'Вернулись к стандартному');
+  }
+};
+
+/* =========================================================
+   🍺 ОТОБРАЖЕНИЕ КУБКА НА ИГРОВОЙ СЦЕНЕ
+   ========================================================= */
+function updateMugSkinDisplay(){
+  let el = document.getElementById('mug-skin-display');
+
+  // Если скин снят — убираем
+  if (!STATE.equippedAchSkin){
+    if (el) el.remove();
+    return;
+  }
+
+  const s = ACH_REWARD_SKINS.find(x => x.id === STATE.equippedAchSkin);
+  if (!s) return;
+
+  if (!el){
+    el = document.createElement('div');
+    el.id = 'mug-skin-display';
+    el.style.cssText = `
+      position:absolute;bottom:130px;right:16px;
+      font-size:56px;line-height:1;
+      pointer-events:none;
+      filter:drop-shadow(0 6px 16px rgba(0,0,0,.7));
+      z-index:8;
+      animation:mugSkinBob 2s ease-in-out infinite;
+    `;
+    const stage = document.getElementById('stage');
+    if (stage) stage.appendChild(el);
+  }
+  el.innerText = s.icon;
+}
+
+/* CSS для анимации кубка */
+(function addMugSkinCSS(){
+  if (document.getElementById('mug-skin-style')) return;
+  const style = document.createElement('style');
+  style.id = 'mug-skin-style';
+  style.textContent = `
+    @keyframes mugSkinBob{
+      0%,100%{transform:translateY(0) rotate(-3deg);}
+      50%{transform:translateY(-8px) rotate(3deg);}
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+/* =========================================================
+   🔄 ОБНОВЛЕНИЕ ПАНЕЛЕЙ B
+   ========================================================= */
+function refreshBPanels(){
+  const profileActive = document.getElementById('screen-profile').classList.contains('active');
+  if (!profileActive) return;
+  const appHidden = document.getElementById('app').classList.contains('hidden');
+  if (appHidden) return;
+
+  renderCollectionPanel();
+  renderSecretPanel();
+  renderAchRewardPanel();
+}
+
+setTimeout(refreshBPanels, 400);
+setInterval(refreshBPanels, 1500);
+
+// Хук на таб профиля
+(function hookProfileTabB(){
+  const profileBtn = document.querySelector('.tabbar button[data-tab="profile"]');
+  if (!profileBtn) return;
+  profileBtn.addEventListener('click', () => setTimeout(refreshBPanels, 120));
+})();
+
+/* =========================================================
+   🚀 ВОССТАНОВЛЕНИЕ ПРИ ЗАГРУЗКЕ
+   ========================================================= */
+setTimeout(() => {
+  // Восстанавливаем скин-кубок на сцене
+  if (STATE.equippedAchSkin){
+    updateMugSkinDisplay();
+  }
+  // Проверяем секрет при старте
+  checkSecretUnlock();
+}, 600);
+
+console.log(
+  '%c✅ Пачка B загружена: коллекция, секрет, скины',
+  'background:linear-gradient(135deg,#f7c948,#ff36ee);color:#fff;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:12px'
+);
 </script>
 </body>
 </html>
