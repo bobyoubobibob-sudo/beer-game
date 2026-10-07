@@ -3291,7 +3291,6 @@ window.nextOnbSlide = () => {
 
 /* ===== BOOT ===== */
 (function boot(){
-  if (typeof isSecretUnlocked === 'function' && (isSecretUnlocked() || STATE.charId === 'secret')) ensureSecretInCharacters();
   if (STATE.charId && CHARACTERS.find(c=>c.id===STATE.charId)){
     // считаем оффлайн-доход
     applyOfflineEarnings();
@@ -3475,8 +3474,8 @@ function draw(){
     const ih = photoImg.naturalHeight || 1;
     const ratio = iw / ih;
 
-    const METER_PAD = 110; // сколько оставить снизу под шкалу
-    let drawH = Math.min(h * 0.9, w * 1.15);
+const METER_PAD = 0;
+let drawH = Math.min(h * 1.0, w * 1.25);
     let drawW = drawH * ratio;
     if (drawW > w * 1.08){
       drawW = w * 1.08;
@@ -6448,6 +6447,10 @@ setTimeout(() => {
   }
   // Проверяем секрет при старте
   checkSecretUnlock();
+  // Если персонаж = secret и его только что добавили — обновляем UI
+  if (STATE.charId === 'secret'){
+    try { refreshTopbar(); renderProfile(); } catch(e){}
+  }
 }, 600);
 
 console.log(
