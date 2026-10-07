@@ -31,45 +31,220 @@ html,body{
   display:flex;flex-direction:column;position:relative;background:var(--bg);
   overflow:hidden;
 }
+#app.hidden{display:none !important;}
 
-/* ==== TOP BAR ==== */
+/* =========================================================
+   SETUP SCREENS (splash + character select)
+   ========================================================= */
+.setup{
+  position:fixed;inset:0;display:none;flex-direction:column;
+  z-index:50;background:var(--bg);overflow:hidden;
+}
+.setup.active{display:flex;}
+
+/* SPLASH */
+#splash{
+  align-items:center;justify-content:center;text-align:center;
+  background:
+    radial-gradient(ellipse at 50% 40%,rgba(245,166,35,.22) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 90%,rgba(165,102,255,.10) 0%,transparent 60%),
+    linear-gradient(180deg,#0e0a06 0%,#060404 100%);
+  padding:40px 24px calc(40px + env(safe-area-inset-bottom));
+}
+.splash-logo{
+  margin-bottom:28px;position:relative;
+  animation:logoIn 1s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes logoIn{
+  0%{opacity:0;transform:scale(.7) translateY(20px);}
+  100%{opacity:1;transform:scale(1) translateY(0);}
+}
+.splash-icon{
+  font-size:88px;line-height:1;margin-bottom:16px;
+  filter:drop-shadow(0 8px 30px rgba(245,166,35,.55));
+  animation:bobble 3.5s ease-in-out infinite;
+}
+@keyframes bobble{
+  0%,100%{transform:translateY(0) rotate(-3deg);}
+  50%{transform:translateY(-10px) rotate(3deg);}
+}
+.splash-title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:52px;
+  letter-spacing:4px;text-transform:uppercase;line-height:.95;
+  background:linear-gradient(180deg,#f7c948 0%,#e08b1f 45%,#7a4510 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.5)) drop-shadow(0 0 24px rgba(245,166,35,.3));
+}
+.splash-title span{display:block;}
+.splash-sub{
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:12px;
+  letter-spacing:6px;text-transform:uppercase;color:var(--dim);
+  margin-top:14px;
+}
+.splash-tag{
+  font-size:12px;color:var(--dim);margin:24px 0 32px;line-height:1.5;
+  max-width:280px;
+}
+.btn-play{
+  padding:16px 56px;border:none;border-radius:16px;
+  background:var(--gold-grad);color:#1a1005;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;
+  letter-spacing:3px;text-transform:uppercase;
+  box-shadow:
+    0 6px 0 #7a4d0f,
+    0 12px 32px rgba(245,166,35,.35),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  cursor:pointer;transition:transform .12s, box-shadow .12s;
+  animation:pulseGlow 2.5s ease-in-out infinite;
+}
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 6px 0 #7a4d0f,0 12px 32px rgba(245,166,35,.35),inset 0 1px 0 rgba(255,255,255,.4);}
+  50%    {box-shadow:0 6px 0 #7a4d0f,0 12px 44px rgba(245,166,35,.6), inset 0 1px 0 rgba(255,255,255,.4);}
+}
+.btn-play:active{transform:translateY(4px);box-shadow:0 2px 0 #7a4d0f,0 6px 20px rgba(245,166,35,.4),inset 0 1px 0 rgba(255,255,255,.4);}
+.splash-footer{
+  position:absolute;bottom:calc(20px + env(safe-area-inset-bottom));
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:#4d4433;font-weight:600;
+}
+
+/* SELECT */
+#select{
+  background:
+    radial-gradient(ellipse at 50% 0%,rgba(245,166,35,.12) 0%,transparent 50%),
+    linear-gradient(180deg,#0e0a06 0%,#080604 100%);
+}
+.select-head{
+  padding:calc(24px + env(safe-area-inset-top)) 20px 16px;
+  text-align:center;border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#0f0b07,#0a0806);
+}
+.select-head .kicker{
+  font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--dim);margin-bottom:6px;
+}
+.select-head .title{
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:24px;
+  letter-spacing:2px;text-transform:uppercase;
+  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.select-head .sub{font-size:11px;color:var(--dim);margin-top:6px;}
+.select-grid{
+  flex:1;overflow-y:auto;padding:16px;
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  -webkit-overflow-scrolling:touch;
+}
+.char-card{
+  position:relative;padding:16px 12px 14px;border-radius:14px;
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;overflow:hidden;
+  transition:transform .15s, border-color .2s, box-shadow .2s;
+}
+.char-card::before{
+  content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  background:radial-gradient(circle at 50% 0%,var(--char-color,rgba(245,166,35,.18)) 0%,transparent 60%);
+  opacity:.35;transition:opacity .2s;
+}
+.char-card:active{transform:scale(.97);}
+.char-card.selected{
+  border-color:var(--amber);
+  box-shadow:0 0 0 1px rgba(245,166,35,.35),0 8px 28px rgba(245,166,35,.2);
+}
+.char-card.selected::before{opacity:.7;}
+.char-card.selected::after{
+  content:'✓';position:absolute;top:8px;right:10px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--gold-grad);color:#1a1005;
+  font-weight:900;font-size:13px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(245,166,35,.5);
+}
+.char-emoji{
+  font-size:42px;line-height:1;margin-top:4px;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.5));
+  transition:transform .2s;
+}
+.char-card.selected .char-emoji{transform:scale(1.08);}
+.char-nick{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;
+  letter-spacing:.3px;color:var(--text);text-align:center;line-height:1.15;
+}
+.char-real{
+  font-size:10px;color:var(--dim);letter-spacing:.5px;
+  text-transform:uppercase;font-weight:600;
+}
+.char-bio{
+  font-size:10px;color:#5f5642;text-align:center;line-height:1.3;
+  margin-top:2px;
+}
+.select-foot{
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);
+  background:linear-gradient(180deg,#0a0806,#080604);
+  display:flex;gap:10px;
+}
+.btn-confirm{
+  flex:1;padding:14px;border:none;border-radius:12px;
+  background:var(--gold-grad);color:#1a1005;
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;
+  letter-spacing:2px;text-transform:uppercase;
+  box-shadow:0 4px 0 #7a4d0f,0 6px 20px rgba(245,166,35,.3);
+  cursor:pointer;transition:transform .1s;
+}
+.btn-confirm:active{transform:translateY(2px);box-shadow:0 2px 0 #7a4d0f;}
+.btn-confirm:disabled{background:#241a10;color:#5a4a30;box-shadow:none;cursor:not-allowed;}
+
+/* =========================================================
+   MAIN APP (as before)
+   ========================================================= */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;gap:8px;
   padding:calc(10px + env(safe-area-inset-top)) 14px 10px;
   background:linear-gradient(180deg,#0f0c08 0%,#0a0806 100%);
   border-bottom:1px solid var(--border);z-index:10;
 }
-.brand{
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;
-  letter-spacing:1.5px;text-transform:uppercase;
-  background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;white-space:nowrap;
+.player-chip{
+  display:flex;align-items:center;gap:8px;min-width:0;flex:1;
 }
-.prestige-chip{
-  display:none;padding:4px 8px;border-radius:20px;
-  background:linear-gradient(135deg,#7a3fff,#4a1fbf);
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:11px;
-  letter-spacing:.5px;color:#f0e6ff;
-  box-shadow:0 0 12px rgba(165,102,255,.5);
+.player-emoji{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#2a2115,#15110b);
+  border:1px solid var(--border-2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;overflow:hidden;
 }
-.prestige-chip.on{display:inline-block;}
+.player-emoji img{width:100%;height:100%;object-fit:cover;}
+.player-meta{min-width:0;}
+.player-nick{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
+  letter-spacing:.5px;color:var(--text);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
 .hud{display:flex;gap:6px;align-items:center;}
 .pill{
   display:flex;align-items:center;gap:6px;padding:6px 10px;
   background:linear-gradient(180deg,var(--panel-2),var(--panel));
   border:1px solid var(--border);border-radius:10px;
-  font-size:13px;font-weight:700;letter-spacing:0.2px;
+  font-size:13px;font-weight:700;
 }
 .pill .ico{font-size:13px;opacity:.9;}
 .pill .val{font-family:'Oswald',sans-serif;font-weight:600;color:var(--amber);}
 .pill .val.coin{color:#f7c948;}
+.prestige-chip{
+  display:none;padding:4px 8px;border-radius:20px;
+  background:linear-gradient(135deg,#7a3fff,#4a1fbf);
+  font-family:'Oswald',sans-serif;font-weight:700;font-size:11px;
+  color:#f0e6ff;box-shadow:0 0 12px rgba(165,102,255,.5);
+}
+.prestige-chip.on{display:inline-block;}
 
-/* ==== SCREENS ==== */
 .screens{flex:1;position:relative;overflow:hidden;}
 .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;}
 .screen.active{display:flex;}
 
-/* ==== GAME ==== */
 #screen-game{background:radial-gradient(ellipse at 50% 30%,#1a1410 0%,#0a0806 70%);}
 .stage{flex:1;position:relative;overflow:hidden;}
 .stage canvas{width:100%;height:100%;display:block;}
@@ -78,8 +253,7 @@ html,body{
   font-family:'Oswald',sans-serif;font-weight:600;font-size:12px;
   letter-spacing:1.2px;text-transform:uppercase;
   color:var(--amber);text-shadow:0 2px 10px rgba(0,0,0,.8);
-  pointer-events:none;white-space:nowrap;
-  transition:color .2s;
+  pointer-events:none;white-space:nowrap;transition:color .2s;
 }
 .meter{
   position:absolute;bottom:14px;left:14px;right:14px;
@@ -93,209 +267,96 @@ html,body{
   font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
   color:var(--dim);margin-bottom:6px;
 }
-.meter-head .combo{
-  font-family:'Oswald',sans-serif;font-size:14px;color:var(--amber);
-  letter-spacing:0.5px;
-}
-.track{
-  position:relative;height:10px;border-radius:6px;overflow:hidden;
-  background:#120e0a;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);
-}
-.sweet{
-  position:absolute;left:40%;width:35%;height:100%;
-  background:linear-gradient(180deg,#8bc34a,#5a8a1f);
-  box-shadow:0 0 14px rgba(139,195,74,.55);
-}
-.sweet::after{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(90deg,transparent 0 4px,rgba(255,255,255,.12) 4px 5px);
-}
+.meter-head .combo{font-family:'Oswald',sans-serif;font-size:14px;color:var(--amber);}
+.track{position:relative;height:10px;border-radius:6px;overflow:hidden;background:#120e0a;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);}
+.sweet{position:absolute;left:40%;width:35%;height:100%;background:linear-gradient(180deg,#8bc34a,#5a8a1f);box-shadow:0 0 14px rgba(139,195,74,.55);}
+.sweet::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 4px,rgba(255,255,255,.12) 4px 5px);}
 .needle{
   position:absolute;top:-3px;width:4px;height:16px;border-radius:2px;
   background:var(--amber);box-shadow:0 0 10px var(--amber),0 0 4px #fff;
-  transform:translateX(-50%);transition:left .04s linear;
-  left:0%;
+  transform:translateX(-50%);transition:left .04s linear;left:0%;
 }
 
-/* ==== SHOP ==== */
-.shop-cats{
-  display:flex;gap:6px;padding:12px 12px 10px;overflow-x:auto;
-  background:var(--bg-2);border-bottom:1px solid var(--border);
-  scrollbar-width:none;
-}
+.shop-cats{display:flex;gap:6px;padding:12px 12px 10px;overflow-x:auto;background:var(--bg-2);border-bottom:1px solid var(--border);scrollbar-width:none;}
 .shop-cats::-webkit-scrollbar{display:none;}
-.cat{
-  flex-shrink:0;padding:8px 14px;border-radius:20px;
-  background:var(--panel);border:1px solid var(--border);
-  color:var(--dim);font-family:'Inter';font-weight:600;font-size:12px;
-  letter-spacing:.3px;cursor:pointer;white-space:nowrap;
-  transition:all .2s;
-}
-.cat.active{
-  background:var(--gold-grad);border-color:transparent;color:#1a1005;
-  box-shadow:0 4px 14px rgba(245,166,35,.25);
-}
-.list{
-  flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;
-  -webkit-overflow-scrolling:touch;
-}
+.cat{flex-shrink:0;padding:8px 14px;border-radius:20px;background:var(--panel);border:1px solid var(--border);color:var(--dim);font-family:'Inter';font-weight:600;font-size:12px;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.cat.active{background:var(--gold-grad);border-color:transparent;color:#1a1005;box-shadow:0 4px 14px rgba(245,166,35,.25);}
+.list{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch;}
 .card{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   padding:12px 14px;border-radius:12px;
-  background:linear-gradient(180deg,var(--panel-2) 0%,var(--panel) 100%);
-  border:1px solid var(--border);position:relative;
-  transition:border-color .2s;
+  background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--border);transition:border-color .2s;
 }
 .card.equipped{border-color:var(--amber);box-shadow:0 0 0 1px rgba(245,166,35,.15),0 4px 20px rgba(245,166,35,.08);}
-.card-icon{
-  width:44px;height:44px;flex-shrink:0;border-radius:10px;
-  background:linear-gradient(180deg,#251d14,#181310);
-  border:1px solid var(--border-2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;overflow:hidden;
-}
+.card-icon{width:44px;height:44px;flex-shrink:0;border-radius:10px;background:linear-gradient(180deg,#251d14,#181310);border:1px solid var(--border-2);display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden;}
 .card-icon img{width:100%;height:100%;object-fit:cover;}
 .card-info{flex:1;min-width:0;}
-.card-title{
-  font-weight:700;font-size:13px;letter-spacing:.2px;color:var(--text);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.card-sub{font-size:11px;color:var(--dim);margin-top:2px;letter-spacing:.1px;}
+.card-title{font-weight:700;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-sub{font-size:11px;color:var(--dim);margin-top:2px;}
 .btn-buy{
   flex-shrink:0;padding:8px 14px;border:none;border-radius:8px;
   background:var(--gold-grad);color:#1a1005;
-  font-family:'Inter';font-weight:800;font-size:12px;letter-spacing:.3px;
+  font-family:'Inter';font-weight:800;font-size:12px;
   box-shadow:0 2px 0 rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25);
   cursor:pointer;transition:transform .08s;
 }
 .btn-buy:active{transform:translateY(1px);}
 .btn-buy:disabled{background:var(--panel-2);color:#4d4433;box-shadow:none;cursor:not-allowed;}
-.btn-equipped{
-  flex-shrink:0;padding:7px 12px;border-radius:8px;
-  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.4);
-  color:var(--amber);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-}
+.btn-equipped{flex-shrink:0;padding:7px 12px;border-radius:8px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.4);color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;}
 
-/* ==== LEADERBOARD ==== */
 .lead-head{padding:14px 16px 4px;}
-.lead-title{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;
-  letter-spacing:1px;text-transform:uppercase;
-}
+.lead-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:18px;letter-spacing:1px;text-transform:uppercase;}
 .lead-sub{font-size:11px;color:var(--dim);margin-top:2px;}
-.lead-row{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:12px 14px;border-radius:10px;
-  background:linear-gradient(180deg,var(--panel-2),var(--panel));
-  border:1px solid var(--border);
-}
+.lead-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-radius:10px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);}
 .lead-row.me{border-color:var(--amber);background:linear-gradient(180deg,#221a0d,#181208);}
 .lead-left{display:flex;align-items:center;gap:12px;min-width:0;}
-.lead-rank{
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;
-  width:28px;text-align:center;color:var(--dim);flex-shrink:0;
-}
+.lead-rank{font-family:'Oswald',sans-serif;font-weight:700;font-size:16px;width:28px;text-align:center;color:var(--dim);flex-shrink:0;}
 .lead-rank.top1{color:#f7c948;text-shadow:0 0 12px rgba(247,201,72,.6);}
 .lead-rank.top2{color:#c0c0c0;}
 .lead-rank.top3{color:#cd7f32;}
-.lead-name{
-  font-weight:600;font-size:13px;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis;
-}
-.lead-score{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;
-  color:var(--amber);flex-shrink:0;
-}
-.empty{
-  text-align:center;padding:40px 20px;color:var(--dim);font-size:13px;
-  line-height:1.5;
-}
+.lead-name{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lead-score{font-family:'Oswald',sans-serif;font-weight:600;font-size:15px;color:var(--amber);flex-shrink:0;}
+.empty{text-align:center;padding:40px 20px;color:var(--dim);font-size:13px;line-height:1.5;}
 
-/* ==== PROFILE ==== */
-.prof-top{
-  padding:22px 20px 18px;text-align:center;
-  background:radial-gradient(ellipse at 50% 0%,#1f1810 0%,transparent 70%);
-  border-bottom:1px solid var(--border);
-}
+.prof-top{padding:22px 20px 18px;text-align:center;background:radial-gradient(ellipse at 50% 0%,#1f1810 0%,transparent 70%);border-bottom:1px solid var(--border);}
 .avatar{
-  width:78px;height:78px;margin:0 auto 12px;border-radius:50%;
+  width:84px;height:84px;margin:0 auto 12px;border-radius:50%;
   background:linear-gradient(135deg,#2a2115,#15110b);
   border:2px solid var(--amber);
-  display:flex;align-items:center;justify-content:center;font-size:36px;
+  display:flex;align-items:center;justify-content:center;font-size:42px;
   box-shadow:0 0 30px rgba(245,166,35,.25);
   overflow:hidden;position:relative;
 }
 .avatar.prestiged{border-color:var(--purple);box-shadow:0 0 30px rgba(165,102,255,.45);}
 .avatar img{width:100%;height:100%;object-fit:cover;}
-.prof-name{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;
-  letter-spacing:1px;text-transform:uppercase;
-}
-.prof-rank{
-  display:inline-block;margin-top:6px;padding:4px 12px;
-  background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.35);
-  border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;
-  text-transform:uppercase;color:var(--amber);
-}
-.prof-stats{
-  display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;
-}
-.stat-box{
-  padding:14px;border-radius:12px;
-  background:linear-gradient(180deg,var(--panel-2),var(--panel));
-  border:1px solid var(--border);
-}
-.stat-box .label{
-  font-size:10px;color:var(--dim);text-transform:uppercase;
-  letter-spacing:1px;font-weight:600;
-}
-.stat-box .value{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:20px;
-  margin-top:6px;color:var(--amber);
-}
+.prof-name{font-family:'Oswald',sans-serif;font-weight:600;font-size:22px;letter-spacing:1px;text-transform:uppercase;}
+.prof-realname{font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.prof-rank{display:inline-block;margin-top:8px;padding:4px 12px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.35);border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber);}
+.prof-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;}
+.stat-box{padding:14px;border-radius:12px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--border);}
+.stat-box .label{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+.stat-box .value{font-family:'Oswald',sans-serif;font-weight:600;font-size:20px;margin-top:6px;color:var(--amber);}
 .section-title{
-  padding:6px 16px 8px;
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
+  padding:6px 16px 8px;font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
   letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);
   display:flex;justify-content:space-between;align-items:center;
 }
 .section-title .count{color:var(--amber);font-size:12px;}
 
-/* prestige panel */
 .prestige-panel{
   margin:0 14px 14px;padding:14px;border-radius:14px;
   background:linear-gradient(135deg,#1d1030 0%,#160c25 60%,#120a1e 100%);
   border:1px solid #3a2a5a;position:relative;overflow:hidden;
 }
-.prestige-panel::before{
-  content:'';position:absolute;top:-40%;right:-20%;width:70%;height:120%;
-  background:radial-gradient(circle,rgba(165,102,255,.18),transparent 65%);
-  pointer-events:none;
-}
-.pp-head{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;
-}
-.pp-title{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;
-  letter-spacing:1px;text-transform:uppercase;color:#d9c2ff;
-}
-.pp-lvl{
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;
-  color:#c9a8ff;text-shadow:0 0 12px rgba(165,102,255,.6);
-}
+.prestige-panel::before{content:'';position:absolute;top:-40%;right:-20%;width:70%;height:120%;background:radial-gradient(circle,rgba(165,102,255,.18),transparent 65%);pointer-events:none;}
+.pp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.pp-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:#d9c2ff;}
+.pp-lvl{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;color:#c9a8ff;text-shadow:0 0 12px rgba(165,102,255,.6);}
 .pp-desc{font-size:11px;color:#a495c9;line-height:1.5;margin-bottom:10px;}
-.pp-progress{
-  height:8px;border-radius:5px;background:#0d0818;overflow:hidden;
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.6);margin-bottom:8px;
-}
-.pp-fill{
-  height:100%;background:linear-gradient(90deg,#7a3fff,#c9a8ff);
-  box-shadow:0 0 10px rgba(165,102,255,.6);transition:width .3s;
-}
-.pp-meta{
-  display:flex;justify-content:space-between;font-size:10px;
-  color:#8a7ab0;font-weight:600;letter-spacing:.5px;margin-bottom:10px;
-}
+.pp-progress{height:8px;border-radius:5px;background:#0d0818;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);margin-bottom:8px;}
+.pp-fill{height:100%;background:linear-gradient(90deg,#7a3fff,#c9a8ff);box-shadow:0 0 10px rgba(165,102,255,.6);transition:width .3s;}
+.pp-meta{display:flex;justify-content:space-between;font-size:10px;color:#8a7ab0;font-weight:600;margin-bottom:10px;}
 .btn-prestige{
   width:100%;padding:12px;border:none;border-radius:10px;
   background:linear-gradient(135deg,#8b4dff,#5a20c9);color:#fff;
@@ -304,186 +365,66 @@ html,body{
   box-shadow:0 4px 0 #3a1a80,0 0 20px rgba(165,102,255,.4);
   transition:transform .1s;
 }
-.btn-prestige:active{transform:translateY(2px);box-shadow:0 2px 0 #3a1a80,0 0 20px rgba(165,102,255,.4);}
-.btn-prestige:disabled{
-  background:#241a38;color:#5a4d75;box-shadow:none;cursor:not-allowed;
-}
+.btn-prestige:active{transform:translateY(2px);}
+.btn-prestige:disabled{background:#241a38;color:#5a4d75;box-shadow:none;cursor:not-allowed;}
 
-/* daily */
-.daily-panel{
-  margin:0 14px 14px;padding:14px;border-radius:14px;
-  background:linear-gradient(135deg,#2a1c0d 0%,#1a1208 100%);
-  border:1px solid #4a3418;
-}
-.daily-head{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
-}
-.daily-title{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;
-  letter-spacing:1px;text-transform:uppercase;color:#f5c97a;
-}
-.daily-streak{
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;
-  color:var(--amber);
-}
-.daily-days{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px;
-}
-.day-dot{
-  aspect-ratio:1;border-radius:8px;
-  background:#1a1208;border:1px solid #3a2a1a;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#5a4a30;
-}
-.day-dot.done{
-  background:linear-gradient(180deg,#f5c948,#c98f1a);color:#1a1005;border-color:transparent;
-}
-.day-dot.today{
-  border-color:var(--amber);color:var(--amber);
-  box-shadow:0 0 10px rgba(245,166,35,.4);
-}
-.btn-daily{
-  width:100%;padding:12px;border:none;border-radius:10px;
-  background:var(--gold-grad);color:#1a1005;
-  font-family:'Inter';font-weight:800;font-size:12px;letter-spacing:1px;
-  text-transform:uppercase;cursor:pointer;
-  box-shadow:0 4px 0 #7a4d0f;transition:transform .1s;
-}
-.btn-daily:active{transform:translateY(2px);box-shadow:0 2px 0 #7a4d0f;}
+.daily-panel{margin:0 14px 14px;padding:14px;border-radius:14px;background:linear-gradient(135deg,#2a1c0d 0%,#1a1208 100%);border:1px solid #4a3418;}
+.daily-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.daily-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#f5c97a;}
+.daily-streak{font-family:'Oswald',sans-serif;font-weight:700;font-size:14px;color:var(--amber);}
+.daily-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px;}
+.day-dot{aspect-ratio:1;border-radius:8px;background:#1a1208;border:1px solid #3a2a1a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#5a4a30;}
+.day-dot.done{background:linear-gradient(180deg,#f5c948,#c98f1a);color:#1a1005;border-color:transparent;}
+.day-dot.today{border-color:var(--amber);color:var(--amber);box-shadow:0 0 10px rgba(245,166,35,.4);}
+.btn-daily{width:100%;padding:12px;border:none;border-radius:10px;background:var(--gold-grad);color:#1a1005;font-family:'Inter';font-weight:800;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 0 #7a4d0f;transition:transform .1s;}
+.btn-daily:active{transform:translateY(2px);}
 .btn-daily:disabled{background:#241a10;color:#5a4a30;box-shadow:none;cursor:not-allowed;}
 
-/* achievements grid */
-.ach-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px 20px;
-}
-.ach{
-  aspect-ratio:1;border-radius:12px;position:relative;
-  background:linear-gradient(180deg,#181310,#100c08);
-  border:1px solid var(--border);display:flex;align-items:center;
-  justify-content:center;font-size:24px;
-  filter:grayscale(1);opacity:.4;transition:all .3s;
-}
-.ach.unlocked{
-  filter:none;opacity:1;border-color:rgba(245,166,35,.5);
-  background:linear-gradient(180deg,#2a1e0e,#1a1208);
-  box-shadow:0 0 12px rgba(245,166,35,.25),inset 0 1px 0 rgba(255,255,255,.08);
-}
-.ach-reward{
-  position:absolute;bottom:3px;right:4px;
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:8px;
-  color:var(--amber);letter-spacing:.3px;
-}
+.ach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px 20px;}
+.ach{aspect-ratio:1;border-radius:12px;position:relative;background:linear-gradient(180deg,#181310,#100c08);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;filter:grayscale(1);opacity:.4;transition:all .3s;}
+.ach.unlocked{filter:none;opacity:1;border-color:rgba(245,166,35,.5);background:linear-gradient(180deg,#2a1e0e,#1a1208);box-shadow:0 0 12px rgba(245,166,35,.25);}
+.ach-reward{position:absolute;bottom:3px;right:4px;font-family:'Oswald',sans-serif;font-weight:700;font-size:8px;color:var(--amber);}
 
-/* ==== TABBAR ==== */
-.tabbar{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  background:linear-gradient(180deg,#0f0c08,#080604);
-  border-top:1px solid var(--border);
-  padding-bottom:env(safe-area-inset-bottom);z-index:10;
-}
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#0f0c08,#080604);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);z-index:10;}
 .tabbar button{
-  background:none;border:none;color:var(--dim);
-  padding:10px 4px 8px;font-family:'Inter';font-size:10px;
-  font-weight:600;letter-spacing:.6px;text-transform:uppercase;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;color:var(--dim);padding:10px 4px 8px;
+  font-family:'Inter';font-size:10px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:3px;
   position:relative;cursor:pointer;transition:color .2s;
 }
 .tabbar button .ico{font-size:20px;line-height:1;filter:grayscale(1) opacity(.55);transition:filter .2s;}
 .tabbar button.active{color:var(--amber);}
 .tabbar button.active .ico{filter:none;}
-.tabbar button.active::before{
-  content:'';position:absolute;top:0;left:28%;right:28%;height:2px;
-  background:var(--amber);border-radius:0 0 3px 3px;
-  box-shadow:0 0 12px var(--amber);
-}
-.tabbar .badge{
-  position:absolute;top:6px;right:calc(50% - 20px);
-  min-width:16px;height:16px;padding:0 4px;
-  background:var(--red);color:#fff;border-radius:8px;
-  font-size:9px;font-weight:800;display:none;
-  align-items:center;justify-content:center;
-  box-shadow:0 0 8px rgba(217,83,79,.6);
-}
+.tabbar button.active::before{content:'';position:absolute;top:0;left:28%;right:28%;height:2px;background:var(--amber);border-radius:0 0 3px 3px;box-shadow:0 0 12px var(--amber);}
+.tabbar .badge{position:absolute;top:6px;right:calc(50% - 20px);min-width:16px;height:16px;padding:0 4px;background:var(--red);color:#fff;border-radius:8px;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(217,83,79,.6);}
 .tabbar .badge.on{display:flex;}
 
-/* ==== MODAL ==== */
-.modal-bg{
-  position:fixed;inset:0;background:rgba(5,3,2,.85);backdrop-filter:blur(6px);
-  display:none;align-items:center;justify-content:center;z-index:100;padding:24px;
-}
+.modal-bg{position:fixed;inset:0;background:rgba(5,3,2,.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;}
 .modal-bg.on{display:flex;}
-.modal{
-  width:100%;max-width:400px;padding:24px;border-radius:18px;
-  background:linear-gradient(180deg,#1d1812,#100c08);
-  border:1px solid var(--border-2);
-  box-shadow:0 20px 60px rgba(0,0,0,.7);
-  text-align:center;
-  animation:popIn .25s ease-out;
-}
-@keyframes popIn{
-  from{transform:scale(.9);opacity:0;}
-  to{transform:scale(1);opacity:1;}
-}
+.modal{width:100%;max-width:400px;padding:24px;border-radius:18px;background:linear-gradient(180deg,#1d1812,#100c08);border:1px solid var(--border-2);box-shadow:0 20px 60px rgba(0,0,0,.7);text-align:center;animation:popIn .25s ease-out;}
+@keyframes popIn{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}
 .modal-icon{font-size:56px;margin-bottom:12px;line-height:1;}
-.modal-title{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:20px;
-  letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;
-}
+.modal-title{font-family:'Oswald',sans-serif;font-weight:600;font-size:20px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
 .modal-text{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:18px;}
 .modal-text b{color:var(--amber);font-weight:700;}
 .modal-buttons{display:flex;gap:8px;}
-.modal-buttons button{
-  flex:1;padding:12px;border:none;border-radius:10px;cursor:pointer;
-  font-family:'Inter';font-weight:800;font-size:13px;letter-spacing:.5px;
-}
-.modal-buttons .cancel{
-  background:var(--panel-2);color:var(--dim);border:1px solid var(--border-2);
-}
-.modal-buttons .confirm{
-  background:var(--gold-grad);color:#1a1005;
-  box-shadow:0 3px 0 #7a4d0f;
-}
+.modal-buttons button{flex:1;padding:12px;border:none;border-radius:10px;cursor:pointer;font-family:'Inter';font-weight:800;font-size:13px;}
+.modal-buttons .cancel{background:var(--panel-2);color:var(--dim);border:1px solid var(--border-2);}
+.modal-buttons .confirm{background:var(--gold-grad);color:#1a1005;box-shadow:0 3px 0 #7a4d0f;}
 
-/* ==== TOAST ==== */
-#toasts{
-  position:fixed;top:calc(60px + env(safe-area-inset-top));left:0;right:0;
-  display:flex;flex-direction:column;align-items:center;gap:8px;
-  pointer-events:none;z-index:200;padding:0 20px;
-}
-.toast{
-  padding:10px 16px;border-radius:12px;
-  background:linear-gradient(180deg,#221a0d,#181208);
-  border:1px solid rgba(245,166,35,.4);
-  box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(245,166,35,.15);
-  opacity:0;transform:translateY(-10px);
-  transition:opacity .3s,transform .3s;
-  min-width:180px;text-align:center;
-}
+#toasts{position:fixed;top:calc(60px + env(safe-area-inset-top));left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:200;padding:0 20px;}
+.toast{padding:10px 16px;border-radius:12px;background:linear-gradient(180deg,#221a0d,#181208);border:1px solid rgba(245,166,35,.4);box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(245,166,35,.15);opacity:0;transform:translateY(-10px);transition:opacity .3s,transform .3s;min-width:180px;text-align:center;}
 .toast.show{opacity:1;transform:translateY(0);}
-.toast-text{
-  font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;
-  letter-spacing:.5px;color:var(--amber);
-}
+.toast-text{font-family:'Oswald',sans-serif;font-weight:600;font-size:14px;color:var(--amber);}
 .toast-sub{font-size:11px;color:var(--dim);margin-top:2px;}
-.toast.ach{
-  background:linear-gradient(180deg,#2a1e0e,#1a1208);
-  border-color:var(--amber);
-}
+.toast.ach{background:linear-gradient(180deg,#2a1e0e,#1a1208);border-color:var(--amber);}
 .toast.ach .toast-text{font-size:13px;color:#f5c97a;text-transform:uppercase;}
 .toast.ach .toast-sub{color:var(--amber);font-weight:700;}
 
-/* ==== FX ==== */
-.flash{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  font-family:'Oswald',sans-serif;font-weight:700;font-size:28px;
-  color:var(--amber);text-shadow:0 0 20px rgba(245,166,35,.8);
-  pointer-events:none;animation:floatUp 1s ease-out forwards;z-index:20;
-}
-@keyframes floatUp{
-  0%{opacity:0;transform:translate(-50%,-30%) scale(.7);}
-  25%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
-  100%{opacity:0;transform:translate(-50%,-120%) scale(1);}
-}
+.prof-actions{padding:0 14px 24px;display:flex;flex-direction:column;gap:8px;}
+.btn-action{padding:14px;border-radius:12px;border:1px solid var(--border-2);background:linear-gradient(180deg,var(--panel-2),var(--panel));color:var(--text);font-family:'Inter';font-weight:700;font-size:13px;cursor:pointer;transition:transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-action:active{transform:scale(.985);}
+.btn-action.danger{border-color:rgba(217,83,79,.4);color:#e07b76;}
 
 ::-webkit-scrollbar{width:4px;height:4px;}
 ::-webkit-scrollbar-thumb{background:#2a2318;border-radius:4px;}
@@ -491,10 +432,41 @@ html,body{
 </head>
 <body>
 
-<div id="app">
+<!-- ================= SPLASH ================= -->
+<div id="splash" class="setup active">
+  <div class="splash-logo">
+    <div class="splash-icon">🍺</div>
+    <div class="splash-title"><span>BEER</span><span>BARON</span></div>
+    <div class="splash-sub">Пивной Барон</div>
+  </div>
+  <div class="splash-tag">Зажми экран, держи идеальный поток и стань легендой бара</div>
+  <button class="btn-play" onclick="goToSelect()">Играть</button>
+  <div class="splash-footer">Telegram Mini App · v2.0</div>
+</div>
+
+<!-- ================= CHARACTER SELECT ================= -->
+<div id="select" class="setup">
+  <div class="select-head">
+    <div class="kicker">Шаг 1 из 1</div>
+    <div class="title">Выбери бойца</div>
+    <div class="sub">Каждый барон — со своим характером</div>
+  </div>
+  <div class="select-grid" id="char-grid"></div>
+  <div class="select-foot">
+    <button class="btn-confirm" id="btn-confirm" disabled onclick="confirmCharacter()">В бой!</button>
+  </div>
+</div>
+
+<!-- ================= MAIN APP ================= -->
+<div id="app" class="hidden">
 
   <header class="topbar">
-    <div class="brand">🍺 BEER BARON</div>
+    <div class="player-chip">
+      <div class="player-emoji" id="top-emoji">😎</div>
+      <div class="player-meta">
+        <div class="player-nick" id="top-nick">Барон</div>
+      </div>
+    </div>
     <div class="hud">
       <span class="prestige-chip" id="prestige-chip">⭐ П0</span>
       <div class="pill"><span class="ico">🍺</span><span class="val" id="hud-liters">0.0 L</span></div>
@@ -508,14 +480,8 @@ html,body{
         <canvas id="gameCanvas"></canvas>
         <div class="hint" id="hint">ЗАЖМИ ЭКРАН</div>
         <div class="meter">
-          <div class="meter-head">
-            <span>Поток глотка</span>
-            <span class="combo" id="combo">x1.0</span>
-          </div>
-          <div class="track">
-            <div class="sweet"></div>
-            <div class="needle" id="needle"></div>
-          </div>
+          <div class="meter-head"><span>Поток глотка</span><span class="combo" id="combo">x1.0</span></div>
+          <div class="track"><div class="sweet"></div><div class="needle" id="needle"></div></div>
         </div>
       </div>
     </section>
@@ -542,7 +508,8 @@ html,body{
       <div style="flex:1;overflow-y:auto;">
         <div class="prof-top">
           <div class="avatar" id="prof-avatar">😎</div>
-          <div class="prof-name" id="prof-name">Пацан</div>
+          <div class="prof-name" id="prof-name">Барон</div>
+          <div class="prof-realname" id="prof-realname"></div>
           <div class="prof-rank" id="prof-rank">НОВИЧОК</div>
         </div>
 
@@ -553,39 +520,25 @@ html,body{
           <div class="stat-box"><div class="label">Множитель</div><div class="value" id="prof-mult">×1</div></div>
         </div>
 
-        <!-- PRESTIGE -->
         <div class="prestige-panel">
-          <div class="pp-head">
-            <span class="pp-title">⭐ Престиж</span>
-            <span class="pp-lvl" id="pp-level">Ур. 0</span>
-          </div>
+          <div class="pp-head"><span class="pp-title">⭐ Престиж</span><span class="pp-lvl" id="pp-level">Ур. 0</span></div>
           <div class="pp-desc" id="pp-desc">Сбрось прогресс и получи постоянный ×2 к литрам и монетам.</div>
           <div class="pp-progress"><div class="pp-fill" id="pp-fill" style="width:0%"></div></div>
-          <div class="pp-meta">
-            <span id="pp-progress-text">0 / 1000 L</span>
-            <span id="pp-mult-text">×1 → ×2</span>
-          </div>
+          <div class="pp-meta"><span id="pp-progress-text">0 / 1000 L</span><span id="pp-mult-text">×1 → ×2</span></div>
           <button class="btn-prestige" id="pp-btn" disabled onclick="openPrestigeModal()">Нужно 1000 L</button>
         </div>
 
-        <!-- DAILY -->
         <div class="daily-panel">
-          <div class="daily-head">
-            <span class="daily-title">🎁 Ежедневный бонус</span>
-            <span class="daily-streak" id="daily-streak">0/7</span>
-          </div>
+          <div class="daily-head"><span class="daily-title">🎁 Ежедневный бонус</span><span class="daily-streak" id="daily-streak">0/7</span></div>
           <div class="daily-days" id="daily-days"></div>
           <button class="btn-daily" id="daily-btn" onclick="claimDaily()">Забрать</button>
         </div>
 
-        <!-- ACHIEVEMENTS -->
-        <div class="section-title">
-          <span>🏅 Достижения</span>
-          <span class="count" id="ach-count">0 / 12</span>
-        </div>
+        <div class="section-title"><span>🏅 Достижения</span><span class="count" id="ach-count">0 / 12</span></div>
         <div class="ach-grid" id="ach-grid"></div>
 
-        <div class="prof-actions" style="padding-bottom:24px;">
+        <div class="prof-actions">
+          <button class="btn-action" onclick="openCharacterSelect()">🎭 Сменить бойца</button>
           <button class="btn-action" onclick="inviteFriend()">📨 Позвать друга</button>
           <button class="btn-action danger" onclick="resetProgress()">🔄 Сбросить всё</button>
         </div>
@@ -598,50 +551,48 @@ html,body{
     <button                data-tab="shop"    onclick="switchTab('shop',event)"><span class="ico">🛒</span>Улучшения</button>
     <button                data-tab="top"     onclick="switchTab('top',event)"><span class="ico">🏆</span>Топ</button>
     <button                data-tab="profile" onclick="switchTab('profile',event)">
-      <span class="ico">👤</span>Профиль
-      <span class="badge" id="badge-profile"></span>
+      <span class="ico">👤</span>Профиль<span class="badge" id="badge-profile"></span>
     </button>
   </nav>
 </div>
 
-<div class="modal-bg" id="modal-bg">
-  <div class="modal" id="modal"></div>
-</div>
-
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal"></div></div>
 <div id="toasts"></div>
 
 <script>
 /* =========================================================
-   ⚙️  ASSETS  —  свои картинки
-   =========================================================
-   sprite — покадровая анимация. sheet = спрайтшит (PNG).
-   idle/drink — описание строк: {row, frames, fps}
-   Если sprite пуст → используется character → canvas-мужик.
+   ⚙️ ASSETS
    ========================================================= */
 const ASSETS = {
-  background: "",   // фон игрового поля
-  character:  "",   // статичная картинка персонажа
-  avatar:     "",   // аватарка в профиле
-
-  sprite: {
-    sheet: "",      // URL спрайтшита
-    frameW: 128,
-    frameH: 128,
-    idle:  { row: 0, frames: 4, fps: 6 },
-    drink: { row: 1, frames: 6, fps: 14 },
-  },
-
+  background: "",
+  character:  "",
+  avatar:     "",
+  sprite: { sheet:"", frameW:128, frameH:128, idle:{row:0,frames:4,fps:6}, drink:{row:1,frames:6,fps:14} },
   beer: { lager:"", dark:"", sour:"", cyber:"" },
   mug:  { glass:"", stein:"", horn:"", gold:"" },
   skin: { hoodie:"", leather:"", miami:"", suit:"" },
 };
 
 /* =========================================================
-   ☁️  LEADERBOARD / STORAGE
+   🧑 CHARACTERS — 8 бойцов
+   ========================================================= */
+const CHARACTERS = [
+  { id:'zheka',   realName:'Жека',       nick:'Жека Бочка',    emoji:'🛢️', color:'#f5a623', glow:'#c97e15', bio:'Тяжёлый вес, лёгкий нрав' },
+  { id:'vugar',   realName:'Вугар',      nick:'Вугар Хмель',   emoji:'🌾', color:'#c99a3a', glow:'#7a5a1a', bio:'Хмельной характер' },
+  { id:'elchin',  realName:'Эльчин',     nick:'Эльчин Эль',    emoji:'⚡', color:'#e0c038', glow:'#8a7020', bio:'Эль — его стихия' },
+  { id:'olegm',   realName:'Олег М',     nick:'Олег Солод',    emoji:'🍯', color:'#d4a53f', glow:'#7a5f18', bio:'Знает толк в солоде' },
+  { id:'olegb',   realName:'Олег Б',     nick:'Олег Бархат',   emoji:'🎩', color:'#b8862b', glow:'#5a3f10', bio:'Мягкий, но крепкий' },
+  { id:'dimon',   realName:'Димон',      nick:'Димон Драфт',   emoji:'🎯', color:'#8bc34a', glow:'#3a5a10', bio:'Точный удар по кружке' },
+  { id:'vityaka', realName:'Витяка',     nick:'Витяка Викинг', emoji:'⚔️', color:'#a566ff', glow:'#4a1fbf', bio:'Рог в руке, ветер в голове' },
+  { id:'vanya',   realName:'Ваня Цыган', nick:'Ваня Царь',     emoji:'👑', color:'#f7c948', glow:'#a87515', bio:'На троне из бочек' },
+];
+const getChar = id => CHARACTERS.find(c => c.id === id) || CHARACTERS[0];
+
+/* =========================================================
+   ☁️ LEADERBOARD / STORAGE
    ========================================================= */
 const LEADERBOARD_API = "https://6ac67a23bea0e72cf5c915cd.mockapi.io/players";
-const SAVE_KEY  = "beer_baron_v2";
-const DAILY_KEY = "beer_baron_daily_v1";
+const SAVE_KEY  = "beer_baron_v3";
 const DAY_MS = 86400000;
 
 /* =========================================================
@@ -701,9 +652,6 @@ const RANKS = [
   { min:25000, name:"ЛЕГЕНДА" },
 ];
 
-/* =========================================================
-   🏅 ACHIEVEMENTS
-   ========================================================= */
 const ACHIEVEMENTS = [
   { id:'first',     icon:'🍺', name:'Первый глоток',    desc:'Выпить 1 литр',              reward:50,    check:s=>s.best>=1 },
   { id:'bucket',    icon:'🪣', name:'Ведро',            desc:'Выпить 10 литров',           reward:200,   check:s=>s.best>=10 },
@@ -712,10 +660,10 @@ const ACHIEVEMENTS = [
   { id:'combo',     icon:'🔥', name:'Идеальный поток',  desc:'Удержать комбо ×5',          reward:500,   check:s=>s.maxCombo>=5 },
   { id:'rich',      icon:'💰', name:'Буржуй',           desc:'Заработать 10 000 ₽ всего',  reward:1000,  check:s=>s.totalCoins>=10000 },
   { id:'tycoon',    icon:'💎', name:'Магнат',           desc:'Заработать 100 000 ₽ всего', reward:10000, check:s=>s.totalCoins>=100000 },
-  { id:'sorts',     icon:'🍻', name:'Дегустатор',       desc:'Открыть все сорта',          reward:1500,  check:s=>Object.values(BEERS).every(b=>b.owned) },
-  { id:'barware',   icon:'🏺', name:'Бармен',           desc:'Открыть все бокалы',         reward:2000,  check:s=>Object.values(MUGS).every(m=>m.owned) },
-  { id:'stylish',   icon:'👔', name:'Модник',           desc:'Открыть все образы',         reward:3000,  check:s=>Object.values(SKINS).every(s2=>s2.owned) },
-  { id:'auto5',     icon:'⚙️', name:'Автоматизация',    desc:'Купить 5 авто-апгрейдов',    reward:500,   check:s=>AUTO.reduce((a,b)=>a+b.count,0)>=5 },
+  { id:'sorts',     icon:'🍻', name:'Дегустатор',       desc:'Открыть все сорта',          reward:1500,  check:()=>Object.values(BEERS).every(b=>b.owned) },
+  { id:'barware',   icon:'🏺', name:'Бармен',           desc:'Открыть все бокалы',         reward:2000,  check:()=>Object.values(MUGS).every(m=>m.owned) },
+  { id:'stylish',   icon:'👔', name:'Модник',           desc:'Открыть все образы',         reward:3000,  check:()=>Object.values(SKINS).every(s=>s.owned) },
+  { id:'auto5',     icon:'⚙️', name:'Автоматизация',    desc:'Купить 5 авто-апгрейдов',    reward:500,   check:()=>AUTO.reduce((a,b)=>a+b.count,0)>=5 },
   { id:'prestige1', icon:'⭐', name:'Новая жизнь',      desc:'Сделать первый престиж',     reward:0,     check:s=>s.prestige>=1 },
 ];
 
@@ -723,17 +671,17 @@ const ACHIEVEMENTS = [
    📊 STATE
    ========================================================= */
 const STATE = {
+  charId: null,
   liters:0, coins:10, best:0,
   chug:0, pressing:false, choke:0, combo:1, maxCombo:1,
   curBeer:'lager', curMug:'glass', curSkin:'hoodie',
   autoLps:0, totalCoins:0,
-  prestige:0,
-  achievements:[],
+  prestige:0, achievements:[],
   dailyStreak:0, dailyLast:0,
   cloudSyncedLiters:0, lastCloudSync:0,
 };
-function getPrestigeMult(){ return Math.pow(2, STATE.prestige); }
-function getPrestigeCost(){ return 1000 * Math.pow(3, STATE.prestige); }
+const getPrestigeMult = () => Math.pow(2, STATE.prestige);
+const getPrestigeCost = () => 1000 * Math.pow(3, STATE.prestige);
 
 /* =========================================================
    💾 SAVE / LOAD
@@ -741,6 +689,7 @@ function getPrestigeCost(){ return 1000 * Math.pow(3, STATE.prestige); }
 function save(){
   try{
     const d = {
+      charId: STATE.charId,
       liters:STATE.liters, coins:STATE.coins, best:STATE.best,
       totalCoins:STATE.totalCoins,
       curBeer:STATE.curBeer, curMug:STATE.curMug, curSkin:STATE.curSkin,
@@ -762,6 +711,7 @@ function load(){
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return;
     const d = JSON.parse(raw);
+    STATE.charId      = d.charId || null;
     STATE.liters      = d.liters || 0;
     STATE.coins       = d.coins  ?? 10;
     STATE.best        = d.best   || 0;
@@ -791,14 +741,14 @@ function playGulp(){
   try{
     if (!actx) actx = new AC();
     const t = actx.currentTime;
-    const osc = actx.createOscillator(), g = actx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(210, t);
-    osc.frequency.exponentialRampToValueAtTime(72, t + 0.11);
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(210, t);
+    o.frequency.exponentialRampToValueAtTime(72, t + 0.11);
     g.gain.setValueAtTime(0.16, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    osc.connect(g).connect(actx.destination);
-    osc.start(t); osc.stop(t + 0.13);
+    o.connect(g).connect(actx.destination);
+    o.start(t); o.stop(t + 0.13);
   }catch(e){}
 }
 function playDing(){
@@ -807,7 +757,7 @@ function playDing(){
     const t = actx.currentTime;
     [880, 1320, 1760].forEach((f, i) => {
       const o = actx.createOscillator(), g = actx.createGain();
-      o.type = 'triangle'; o.frequency.value = f;
+      o.type='triangle'; o.frequency.value = f;
       g.gain.setValueAtTime(0, t + i*0.06);
       g.gain.linearRampToValueAtTime(0.14, t + i*0.06 + 0.02);
       g.gain.exponentialRampToValueAtTime(0.001, t + i*0.06 + 0.35);
@@ -816,6 +766,78 @@ function playDing(){
     });
   }catch(e){}
 }
+
+/* =========================================================
+   🎬 SETUP FLOW
+   ========================================================= */
+let selectedCharId = null;
+
+function showSetup(id){
+  document.querySelectorAll('.setup').forEach(s=>s.classList.remove('active'));
+  if (id) document.getElementById(id).classList.add('active');
+  document.getElementById('app').classList.add('hidden');
+}
+function showApp(){
+  document.querySelectorAll('.setup').forEach(s=>s.classList.remove('active'));
+  document.getElementById('app').classList.remove('hidden');
+  refreshTopbar();
+  renderProfile();
+  setTimeout(resize, 60);
+}
+
+window.goToSelect = () => {
+  haptic('medium');
+  selectedCharId = STATE.charId || null;
+  renderCharGrid();
+  showSetup('select');
+};
+function openCharacterSelect(){
+  selectedCharId = STATE.charId;
+  renderCharGrid();
+  showSetup('select');
+  haptic('light');
+}
+function renderCharGrid(){
+  const grid = document.getElementById('char-grid');
+  grid.innerHTML = CHARACTERS.map(c => `
+    <div class="char-card ${c.id===selectedCharId?'selected':''}"
+         data-id="${c.id}"
+         style="--char-color:${c.color}33"
+         onclick="selectChar('${c.id}')">
+      <div class="char-emoji">${c.emoji}</div>
+      <div class="char-nick">${c.nick}</div>
+      <div class="char-real">${c.realName}</div>
+      <div class="char-bio">${c.bio}</div>
+    </div>
+  `).join('');
+  const btn = document.getElementById('btn-confirm');
+  btn.disabled = !selectedCharId;
+  btn.innerText = STATE.charId ? 'Играть' : 'В бой!';
+}
+window.selectChar = id => {
+  selectedCharId = id;
+  haptic('light');
+  renderCharGrid();
+};
+window.confirmCharacter = () => {
+  if (!selectedCharId) return;
+  STATE.charId = selectedCharId;
+  save();
+  haptic('success');
+  playDing();
+  showApp();
+  if (!STATE.dailyLast) checkDailyOnStart();
+};
+
+/* boot */
+(function boot(){
+  if (STATE.charId && CHARACTERS.find(c=>c.id===STATE.charId)){
+    showApp();
+    checkDailyOnStart();
+  } else {
+    showSetup('splash');
+  }
+})();
 
 /* =========================================================
    🎨 CANVAS
@@ -855,9 +877,8 @@ const sprite = {
     const a = this.cfg[animName];
     if (!a) return false;
     const frame = Math.floor((timeMs / 1000 * a.fps) % a.frames);
-    const sx = frame * this.cfg.frameW;
-    const sy = a.row * this.cfg.frameH;
-    ctx.drawImage(this.sheet, sx, sy, this.cfg.frameW, this.cfg.frameH, x, y, w, h);
+    ctx.drawImage(this.sheet, frame*this.cfg.frameW, a.row*this.cfg.frameH,
+      this.cfg.frameW, this.cfg.frameH, x, y, w, h);
     return true;
   }
 };
@@ -874,18 +895,15 @@ function draw(){
     const g = ctx.createRadialGradient(w*.5, h*.35, 20, w*.5, h*.35, Math.max(w,h)*.75);
     g.addColorStop(0,'#1c1610'); g.addColorStop(.55,'#100c08'); g.addColorStop(1,'#060404');
     ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
-    const glow = ctx.createRadialGradient(w*.5, h*.55, 10, w*.5, h*.55, 200);
-    glow.addColorStop(0,'rgba(245,166,35,.10)'); glow.addColorStop(1,'rgba(245,166,35,0)');
-    ctx.fillStyle = glow; ctx.fillRect(0,0,w,h);
   }
 
-  // престижное свечение
-  if (STATE.prestige > 0){
-    const p = ctx.createRadialGradient(w*.5, h*.55, 5, w*.5, h*.55, 260);
-    p.addColorStop(0, `rgba(165,102,255,${0.06 + STATE.prestige * 0.02})`);
-    p.addColorStop(1, 'rgba(165,102,255,0)');
-    ctx.fillStyle = p; ctx.fillRect(0,0,w,h);
-  }
+  // свечение от персонажа/престижа
+  const chr = getChar(STATE.charId);
+  const glowC = STATE.prestige > 0 ? '165,102,255' : hexToRgb(chr.color);
+  const p = ctx.createRadialGradient(w*.5, h*.55, 5, w*.5, h*.55, 260);
+  p.addColorStop(0, `rgba(${glowC},${0.08 + STATE.prestige*0.02})`);
+  p.addColorStop(1, `rgba(${glowC},0)`);
+  ctx.fillStyle = p; ctx.fillRect(0,0,w,h);
 
   const bob = Math.sin(tGlobal*0.0035)*3;
   const cx = w*.5, cy = h*.58 + bob;
@@ -905,16 +923,18 @@ function draw(){
     drawGuy(ctx, cx, cy, Math.min(w, h) / 380, drink);
   }
 }
+function hexToRgb(hex){
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? `${parseInt(m[1],16)},${parseInt(m[2],16)},${parseInt(m[3],16)}` : '245,166,35';
+}
 
 function drawGuy(ctx, cx, cy, s, drink){
   const skin = SKINS[STATE.curSkin];
   const beer = BEERS[STATE.curBeer];
   ctx.save();
-  ctx.translate(cx, cy);
-  ctx.scale(s, s);
+  ctx.translate(cx, cy); ctx.scale(s, s);
 
-  ctx.beginPath();
-  ctx.ellipse(0, 165, 90, 14, 0, 0, Math.PI*2);
+  ctx.beginPath(); ctx.ellipse(0, 165, 90, 14, 0, 0, Math.PI*2);
   ctx.fillStyle = 'rgba(0,0,0,.55)'; ctx.fill();
 
   ctx.beginPath();
@@ -923,30 +943,26 @@ function drawGuy(ctx, cx, cy, s, drink){
   ctx.lineTo(-55, 165);
   ctx.quadraticCurveTo(-75, 90, -70, 20);
   ctx.closePath();
-  const bodyGrad = ctx.createLinearGradient(0,20,0,165);
-  bodyGrad.addColorStop(0, skin.color); bodyGrad.addColorStop(1, '#0a0806');
-  ctx.fillStyle = bodyGrad; ctx.fill();
+  const bg = ctx.createLinearGradient(0,20,0,165);
+  bg.addColorStop(0, skin.color); bg.addColorStop(1, '#0a0806');
+  ctx.fillStyle = bg; ctx.fill();
   ctx.lineWidth = 2; ctx.strokeStyle = skin.glow; ctx.stroke();
 
-  ctx.beginPath();
-  ctx.moveTo(-22,20); ctx.lineTo(0,40); ctx.lineTo(22,20);
+  ctx.beginPath(); ctx.moveTo(-22,20); ctx.lineTo(0,40); ctx.lineTo(22,20);
   ctx.strokeStyle = skin.glow; ctx.lineWidth = 2; ctx.stroke();
 
-  ctx.fillStyle = '#c99468';
-  ctx.fillRect(-16,-24,32,48);
+  ctx.fillStyle = '#c99468'; ctx.fillRect(-16,-24,32,48);
 
   ctx.save();
   ctx.translate(0, -52);
   if (drink) ctx.rotate(-0.14);
 
-  ctx.beginPath();
-  ctx.ellipse(0, 0, 34, 40, 0, 0, Math.PI*2);
-  const faceGrad = ctx.createLinearGradient(-20,-30,20,30);
-  faceGrad.addColorStop(0,'#d6a476'); faceGrad.addColorStop(1,'#a97a52');
-  ctx.fillStyle = faceGrad; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(0, 0, 34, 40, 0, 0, Math.PI*2);
+  const fg = ctx.createLinearGradient(-20,-30,20,30);
+  fg.addColorStop(0,'#d6a476'); fg.addColorStop(1,'#a97a52');
+  ctx.fillStyle = fg; ctx.fill();
 
-  ctx.beginPath();
-  ctx.ellipse(0, -18, 36, 26, 0, Math.PI, 0);
+  ctx.beginPath(); ctx.ellipse(0, -18, 36, 26, 0, Math.PI, 0);
   ctx.fillStyle = '#1a0f08'; ctx.fill();
 
   ctx.beginPath();
@@ -959,9 +975,9 @@ function drawGuy(ctx, cx, cy, s, drink){
   ctx.closePath();
   ctx.fillStyle = '#1f1208'; ctx.fill();
 
-  const glassGrad = ctx.createLinearGradient(-30,-20,30,-5);
-  glassGrad.addColorStop(0,'#2a1f12'); glassGrad.addColorStop(1,'#0f0a06');
-  ctx.fillStyle = glassGrad;
+  const gg = ctx.createLinearGradient(-30,-20,30,-5);
+  gg.addColorStop(0,'#2a1f12'); gg.addColorStop(1,'#0f0a06');
+  ctx.fillStyle = gg;
   ctx.beginPath(); ctx.ellipse(-15,-9,15,12,0,0,Math.PI*2); ctx.fill();
   ctx.beginPath(); ctx.ellipse( 15,-9,15,12,0,0,Math.PI*2); ctx.fill();
   ctx.fillStyle = '#3a2c1a'; ctx.fillRect(-3,-11,6,3);
@@ -977,8 +993,7 @@ function drawGuy(ctx, cx, cy, s, drink){
 
   const handX = drink ? -6 : 38;
   const handY = drink ? -78 : 30;
-  ctx.save();
-  ctx.translate(handX, handY);
+  ctx.save(); ctx.translate(handX, handY);
 
   const bw = 40, bh = 62;
   ctx.beginPath(); ctx.rect(-bw/2, -bh/2, bw, bh);
@@ -1006,13 +1021,13 @@ let last = performance.now();
 let achCooldown = 0;
 function loop(now){
   const dt = Math.min(64, now - last);
-  last = now;
-  tGlobal = now;
+  last = now; tGlobal = now;
   tick(dt);
   updateHUD();
   achCooldown -= dt;
   if (achCooldown <= 0){ achCooldown = 1000; checkAchievements(); }
-  if (document.getElementById('screen-game').classList.contains('active')) draw();
+  if (!document.getElementById('app').classList.contains('hidden') &&
+      document.getElementById('screen-game').classList.contains('active')) draw();
   requestAnimationFrame(loop);
 }
 
@@ -1024,8 +1039,7 @@ function tick(dt){
   } else if (STATE.pressing){
     STATE.chug = Math.min(100, STATE.chug + dt * 0.12);
     if (STATE.chug > 95){
-      STATE.choke = 1500;
-      haptic('error');
+      STATE.choke = 1500; haptic('error');
     } else {
       const sweet = STATE.chug >= 40 && STATE.chug <= 75;
       const b = BEERS[STATE.curBeer];
@@ -1034,9 +1048,7 @@ function tick(dt){
         STATE.combo = Math.min(5, STATE.combo + 0.012);
         if (STATE.combo > STATE.maxCombo) STATE.maxCombo = STATE.combo;
         setHint('🔥 ИДЕАЛЬНЫЙ ПОТОК', '#7cb342');
-      } else {
-        setHint('ДЕРЖИ В ЗЕЛЁНОЙ ЗОНЕ', '#f5a623');
-      }
+      } else setHint('ДЕРЖИ В ЗЕЛЁНОЙ ЗОНЕ', '#f5a623');
       const add = 0.002 * m.mult * (sweet ? 2.5 : 1.0) * pMult;
       const coinAdd = add * 15 * b.mult * STATE.combo;
       STATE.liters += add;
@@ -1051,15 +1063,12 @@ function tick(dt){
     setHint('ЗАЖМИ ЭКРАН', '#f5a623');
   }
   if (STATE.autoLps > 0){
-    const addLit  = STATE.autoLps * (dt/1000) * pMult;
-    const addCoin = STATE.autoLps * 6 * (dt/1000) * pMult;
-    STATE.liters += addLit;
-    STATE.coins  += addCoin;
-    STATE.totalCoins += addCoin;
+    const aL = STATE.autoLps * (dt/1000) * pMult;
+    const aC = STATE.autoLps * 6 * (dt/1000) * pMult;
+    STATE.liters += aL; STATE.coins += aC; STATE.totalCoins += aC;
     if (STATE.liters > STATE.best) STATE.best = STATE.liters;
   }
 }
-
 function setHint(text, color){
   const el = document.getElementById('hint');
   if (el.innerText !== text) el.innerText = text;
@@ -1101,9 +1110,7 @@ window.addEventListener('blur', endPress);
 /* =========================================================
    🧭 NAVIGATION
    ========================================================= */
-let activeTab = 'game';
 function switchTab(name, ev){
-  activeTab = name;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.remove('active'));
@@ -1120,16 +1127,15 @@ function switchCat(cat, ev){
   activeCat = cat;
   document.querySelectorAll('.cat').forEach(c=>c.classList.remove('active'));
   ev.currentTarget.classList.add('active');
-  haptic('light');
-  renderShop();
+  haptic('light'); renderShop();
 }
 
 /* =========================================================
    🛒 SHOP
    ========================================================= */
 function iconBox(emoji, url){
-  if (url) return `<div class="card-icon"><img src="${url}" alt=""></div>`;
-  return `<div class="card-icon">${emoji}</div>`;
+  return url ? `<div class="card-icon"><img src="${url}" alt=""></div>`
+             : `<div class="card-icon">${emoji}</div>`;
 }
 function renderShop(){
   const list = document.getElementById('shop-list');
@@ -1180,10 +1186,7 @@ function cardHTML(title, sub, emoji, img, cost, equipped, owned, eqFn, buyFn){
   return `
     <div class="card ${equipped?'equipped':''}">
       ${iconBox(emoji, img)}
-      <div class="card-info">
-        <div class="card-title">${title}</div>
-        <div class="card-sub">${sub}</div>
-      </div>
+      <div class="card-info"><div class="card-title">${title}</div><div class="card-sub">${sub}</div></div>
       ${btn}
     </div>`;
 }
@@ -1192,10 +1195,8 @@ window.buy = (type, id) => {
   const it = store[id];
   if (!it || it.owned) return;
   if (STATE.coins < it.cost){ haptic('error'); return; }
-  STATE.coins -= it.cost;
-  it.owned = true;
-  equip(type, id);
-  save();
+  STATE.coins -= it.cost; it.owned = true;
+  equip(type, id); save();
 };
 window.equip = (type, id) => {
   if (type==='beer') STATE.curBeer = id;
@@ -1229,7 +1230,7 @@ async function renderTop(){
       const isMe = String(p.tg_id) === String(tgUser.id);
       const cls = i===0?'top1':i===1?'top2':i===2?'top3':'';
       const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-      const name = escapeHTML(String(p.name||'Пацан')).slice(0, 20);
+      const name = escapeHTML(String(p.name||'Пацан')).slice(0, 24);
       html += `
         <div class="lead-row ${isMe?'me':''}">
           <div class="lead-left">
@@ -1250,20 +1251,27 @@ function escapeHTML(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;'
    👤 PROFILE
    ========================================================= */
 function getRank(l){ let r = RANKS[0]; for (const x of RANKS) if (l >= x.min) r = x; return r; }
+function refreshTopbar(){
+  const c = getChar(STATE.charId);
+  document.getElementById('top-nick').innerText = c.nick;
+  const emo = document.getElementById('top-emoji');
+  if (ASSETS.avatar) emo.innerHTML = `<img src="${ASSETS.avatar}" alt="">`;
+  else emo.innerText = c.emoji;
+}
 function renderProfile(){
-  document.getElementById('prof-name').innerText = tgUser.first_name || 'Пацан';
+  const c = getChar(STATE.charId);
+  document.getElementById('prof-name').innerText = c.nick;
+  document.getElementById('prof-realname').innerText = c.realName;
   const av = document.getElementById('prof-avatar');
   if (ASSETS.avatar) av.innerHTML = `<img src="${ASSETS.avatar}" alt="">`;
-  else av.innerText = '😎';
+  else av.innerText = c.emoji;
   av.classList.toggle('prestiged', STATE.prestige > 0);
 
   document.getElementById('prof-liters').innerText = STATE.liters.toFixed(1);
   document.getElementById('prof-best').innerText   = STATE.best.toFixed(1);
   document.getElementById('prof-lps').innerText    = (STATE.autoLps * getPrestigeMult()).toFixed(1);
   document.getElementById('prof-mult').innerText   = '×' + getPrestigeMult().toLocaleString('ru-RU');
-
-  const rank = getRank(STATE.best);
-  document.getElementById('prof-rank').innerText = rank.name;
+  document.getElementById('prof-rank').innerText   = getRank(STATE.best).name;
 
   renderPrestigePanel();
   renderDailyPanel();
@@ -1280,21 +1288,16 @@ function renderPrestigePanel(){
   document.getElementById('pp-progress-text').innerText = `${cur.toFixed(0)} / ${cost.toLocaleString('ru-RU')} L`;
   document.getElementById('pp-mult-text').innerText = `×${getPrestigeMult()} → ×${getPrestigeMult()*2}`;
   const btn = document.getElementById('pp-btn');
-  if (cur >= cost){
-    btn.disabled = false;
-    btn.innerText = `Престиж → ×${getPrestigeMult()*2}`;
-  } else {
-    btn.disabled = true;
-    btn.innerText = `Нужно ${cost.toLocaleString('ru-RU')} L`;
-  }
-  const desc = document.getElementById('pp-desc');
-  if (lvl === 0) desc.innerText = 'Сбрось прогресс и получи постоянный ×2 к литрам и монетам.';
-  else desc.innerText = `Ты уже на престиж ${lvl}. Каждый следующий даёт ещё ×2 к добыче.`;
+  if (cur >= cost){ btn.disabled = false; btn.innerText = `Престиж → ×${getPrestigeMult()*2}`; }
+  else { btn.disabled = true; btn.innerText = `Нужно ${cost.toLocaleString('ru-RU')} L`; }
+  const d = document.getElementById('pp-desc');
+  d.innerText = lvl === 0
+    ? 'Сбрось прогресс и получи постоянный ×2 к литрам и монетам.'
+    : `Ты уже на престиж ${lvl}. Каждый следующий даёт ещё ×2 к добыче.`;
 }
 
 function renderDailyPanel(){
-  const streakEl = document.getElementById('daily-streak');
-  streakEl.innerText = `${STATE.dailyStreak}/7`;
+  document.getElementById('daily-streak').innerText = `${STATE.dailyStreak}/7`;
   const days = document.getElementById('daily-days');
   const now = Date.now();
   const claimedToday = (now - STATE.dailyLast) < DAY_MS && STATE.dailyLast > 0;
@@ -1313,24 +1316,19 @@ function renderDailyPanel(){
     const hh = Math.floor(left / 3600000);
     const mm = Math.floor((left % 3600000) / 60000);
     btn.innerText = `Следующий через ${hh}ч ${mm}м`;
-  } else {
-    btn.disabled = false;
-    btn.innerText = 'Забрать 🎁';
-  }
+  } else { btn.disabled = false; btn.innerText = 'Забрать 🎁'; }
   updateProfileBadge();
 }
 
 function renderAchievements(){
   const grid = document.getElementById('ach-grid');
-  let html = '';
-  let unlocked = 0;
+  let html = '', unlocked = 0;
   for (const a of ACHIEVEMENTS){
     const has = STATE.achievements.includes(a.id);
     if (has) unlocked++;
     html += `
       <div class="ach ${has?'unlocked':''}" title="${a.name} — ${a.desc}">
-        ${a.icon}
-        ${a.reward > 0 ? `<span class="ach-reward">+${a.reward}</span>` : ''}
+        ${a.icon}${a.reward > 0 ? `<span class="ach-reward">+${a.reward}</span>` : ''}
       </div>`;
   }
   grid.innerHTML = html;
@@ -1345,32 +1343,22 @@ function openPrestigeModal(){
   if (STATE.liters < cost) return;
   const nextMult = getPrestigeMult() * 2;
   showModal({
-    icon: '⭐',
-    title: 'Сделать престиж?',
-    text: `Ты потеряешь <b>${STATE.liters.toFixed(0)} л</b>, <b>${Math.floor(STATE.coins).toLocaleString('ru-RU')} ₽</b>, все сорта, бокалы, образы и авто.<br><br>Останется: рекорд, достижения.<br>Получишь: постоянный <b>×${nextMult}</b> к добыче.`,
-    confirmText: 'Да, престиж!',
-    onConfirm: doPrestige,
+    icon:'⭐', title:'Сделать престиж?',
+    text:`Ты потеряешь <b>${STATE.liters.toFixed(0)} л</b>, <b>${Math.floor(STATE.coins).toLocaleString('ru-RU')} ₽</b>, все сорта, бокалы, образы и авто.<br><br>Останется: рекорд, достижения.<br>Получишь: постоянный <b>×${nextMult}</b> к добыче.`,
+    confirmText:'Да, престиж!', onConfirm: doPrestige,
   });
 }
 function doPrestige(){
   STATE.prestige++;
-  STATE.liters = 0;
-  STATE.coins = 10;
-  STATE.autoLps = 0;
-  STATE.curBeer = 'lager';
-  STATE.curMug = 'glass';
-  STATE.curSkin = 'hoodie';
+  STATE.liters = 0; STATE.coins = 10; STATE.autoLps = 0;
+  STATE.curBeer = 'lager'; STATE.curMug = 'glass'; STATE.curSkin = 'hoodie';
   for (const k in BEERS) BEERS[k].owned = (k === 'lager');
   for (const k in MUGS)  MUGS[k].owned  = (k === 'glass');
   for (const k in SKINS) SKINS[k].owned = (k === 'hoodie');
   AUTO.forEach(a => a.count = 0);
-  haptic('success');
-  playDing();
+  haptic('success'); playDing();
   showToast('⭐ ПРЕСТИЖ ' + STATE.prestige, 'Множитель ×' + getPrestigeMult());
-  save();
-  renderProfile();
-  renderShop();
-  switchTab('profile', null);
+  save(); renderProfile(); renderShop();
 }
 
 /* =========================================================
@@ -1383,36 +1371,26 @@ function canClaimDaily(){
 function claimDaily(){
   if (!canClaimDaily()) return;
   const now = Date.now();
-  if (STATE.dailyLast > 0 && (now - STATE.dailyLast) > DAY_MS * 2){
-    STATE.dailyStreak = 0;
-  }
+  if (STATE.dailyLast > 0 && (now - STATE.dailyLast) > DAY_MS * 2) STATE.dailyStreak = 0;
   STATE.dailyStreak = Math.min(7, STATE.dailyStreak + 1);
   STATE.dailyLast = now;
-
   const base = 100 * Math.pow(1.8, STATE.dailyStreak - 1);
   const passive = STATE.autoLps * 60;
   const reward = Math.floor((base + passive) * getPrestigeMult());
-  STATE.coins += reward;
-  STATE.totalCoins += reward;
-
-  haptic('success');
-  playDing();
+  STATE.coins += reward; STATE.totalCoins += reward;
+  haptic('success'); playDing();
   showToast('🎁 +' + reward.toLocaleString('ru-RU') + ' ₽', 'День ' + STATE.dailyStreak + ' из 7');
-  save();
-  renderDailyPanel();
+  save(); renderDailyPanel();
 }
 function checkDailyOnStart(){
   if (canClaimDaily()){
     setTimeout(() => {
       showModal({
-        icon: '🎁',
-        title: 'Ежедневный бонус',
-        text: `Забирай награду за вход!<br>Стрик: <b>${STATE.dailyStreak}/7</b>`,
-        confirmText: 'Забрать',
-        cancelText: 'Позже',
-        onConfirm: claimDaily,
+        icon:'🎁', title:'Ежедневный бонус',
+        text:`Забирай награду за вход!<br>Стрик: <b>${STATE.dailyStreak}/7</b>`,
+        confirmText:'Забрать', cancelText:'Позже', onConfirm: claimDaily,
       });
-    }, 600);
+    }, 700);
   }
 }
 
@@ -1426,12 +1404,8 @@ function checkAchievements(){
     try { ok = a.check(STATE); } catch(e){}
     if (ok){
       STATE.achievements.push(a.id);
-      if (a.reward > 0){
-        STATE.coins += a.reward;
-        STATE.totalCoins += a.reward;
-      }
-      haptic('success');
-      playDing();
+      if (a.reward > 0){ STATE.coins += a.reward; STATE.totalCoins += a.reward; }
+      haptic('success'); playDing();
       showAchievementToast(a);
       save();
     }
@@ -1458,11 +1432,7 @@ function showModal({icon, title, text, confirmText='OK', cancelText='Отмен�
   modalBg.classList.add('on');
 }
 window.closeModal = () => { modalBg.classList.remove('on'); modalCallback = null; };
-window.confirmModal = () => {
-  const cb = modalCallback;
-  closeModal();
-  if (typeof cb === 'function') cb();
-};
+window.confirmModal = () => { const cb = modalCallback; closeModal(); if (typeof cb==='function') cb(); };
 modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
 
 function showToast(text, sub=''){
@@ -1483,27 +1453,18 @@ function showAchievementToast(a){
   requestAnimationFrame(()=>el.classList.add('show'));
   setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 3200);
 }
-
 function updateProfileBadge(){
   const badge = document.getElementById('badge-profile');
-  let n = 0;
-  if (canClaimDaily()) n++;
-  // count new achievements? Skipped - all are checked automatically
-  if (n > 0){
-    badge.classList.add('on');
-    badge.innerText = n;
-  } else {
-    badge.classList.remove('on');
-  }
+  if (canClaimDaily()){ badge.classList.add('on'); badge.innerText = '1'; }
+  else badge.classList.remove('on');
 }
 
 window.resetProgress = () => {
   showModal({
-    icon: '⚠️',
-    title: 'Сбросить всё?',
-    text: 'Весь прогресс, достижения и престиж будут удалены безвозвратно.',
-    confirmText: 'Да, удалить',
-    onConfirm: () => { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(DAILY_KEY); location.reload(); }
+    icon:'⚠️', title:'Сбросить всё?',
+    text:'Весь прогресс, достижения, престиж и выбор персонажа будут удалены безвозвратно.',
+    confirmText:'Да, удалить',
+    onConfirm: () => { localStorage.removeItem(SAVE_KEY); location.reload(); }
   });
 };
 
@@ -1522,29 +1483,28 @@ async function syncToCloud(){
   const lit = parseFloat(STATE.liters.toFixed(1));
   if (lit <= 0.5) return;
   if (Math.abs(lit - STATE.cloudSyncedLiters) < 0.5) return;
+  const nick = getChar(STATE.charId).nick.slice(0, 24);
   try{
     const res = await fetch(`${LEADERBOARD_API}?tg_id=${encodeURIComponent(tgUser.id)}`);
     const data = await res.json();
-    const safeName = (tgUser.first_name || "Пацан").toString().slice(0, 20);
     if (Array.isArray(data) && data.length > 0){
       const p = data[0];
       if (lit > Number(p.liters||0)){
         await fetch(`${LEADERBOARD_API}/${p.id}`, {
           method:'PUT', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ liters: lit, name: safeName })
+          body: JSON.stringify({ liters: lit, name: nick })
         });
         STATE.cloudSyncedLiters = lit;
       }
     } else {
       await fetch(LEADERBOARD_API, {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ tg_id:String(tgUser.id), name: safeName, liters: lit })
+        body: JSON.stringify({ tg_id:String(tgUser.id), name: nick, liters: lit })
       });
       STATE.cloudSyncedLiters = lit;
     }
   }catch(e){}
 }
-
 setInterval(save, 3000);
 setInterval(()=>{
   const now = Date.now();
@@ -1563,7 +1523,6 @@ window.addEventListener('beforeunload', () => { save(); });
 /* init */
 renderShop();
 updateHUD();
-checkDailyOnStart();
 </script>
 </body>
 </html>
