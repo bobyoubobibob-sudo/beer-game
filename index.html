@@ -71,8 +71,44 @@ html,body{
     radial-gradient(ellipse at 50% 35%,rgba(245,166,35,.35) 0%,transparent 55%),
     radial-gradient(ellipse at 50% 95%,rgba(165,102,255,.15) 0%,transparent 60%),
     linear-gradient(180deg,#100b06 0%,#060404 100%);
-  padding:60px 24px calc(50px + env(safe-area-inset-bottom));
+  padding:max(calc(24px + env(safe-area-inset-top)), 32px) 20px max(calc(24px + env(safe-area-inset-bottom)), 32px);
   position:relative;
+  overflow-y:auto;
+}
+.splash-icon{
+  font-size:84px;line-height:1;margin-bottom:12px;
+  filter:drop-shadow(0 10px 30px rgba(245,166,35,.6));
+  animation:bobble 3.5s ease-in-out infinite;
+  display:inline-block;
+}
+.splash-title{
+  font-family:'Unbounded',sans-serif;font-weight:800;
+  font-size:34px;line-height:1.05;letter-spacing:-1px;
+  text-transform:uppercase;
+  background:linear-gradient(180deg,#ffe9a8 0%,#f7c948 30%,#e08b1f 60%,#7a4510 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 3px 0 rgba(0,0,0,.65)) drop-shadow(0 0 20px rgba(245,166,35,.4));
+}
+.splash-by{
+  font-family:'Manrope',sans-serif;font-weight:600;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--dim);margin-top:12px;
+}
+.splash-tag{
+  font-size:13px;color:#c4b290;margin:18px 0 24px;
+  line-height:1.5;max-width:300px;font-weight:500;
+  position:relative;z-index:2;
+}
+.btn-play{
+  position:relative;z-index:2;
+  padding:16px 52px;border:none;border-radius:16px;
+  background:var(--gold-grad);color:#1a1005;
+  font-family:'Unbounded',sans-serif;font-weight:700;
+  font-size:18px;letter-spacing:2px;text-transform:uppercase;
+  box-shadow:0 6px 0 #7a4d0f,0 12px 30px rgba(245,166,35,.45),inset 0 1px 0 rgba(255,255,255,.5);
+  cursor:pointer;transition:transform .12s,box-shadow .2s;
+  animation:pulseGlow 2.5s ease-in-out infinite;
   overflow:hidden;
 }
 #splash::before{
@@ -413,7 +449,11 @@ html,body{
 /* ============ TOPBAR ============ */
 .topbar{
   display:flex;align-items:center;justify-content:space-between;
-  gap:6px;padding:calc(8px + env(safe-area-inset-top)) 10px 8px;
+  gap:6px;
+  padding-top:max(calc(12px + env(safe-area-inset-top)), 48px);
+  padding-bottom:10px;
+  padding-left:max(10px, env(safe-area-inset-left));
+  padding-right:max(10px, env(safe-area-inset-right));
   background:linear-gradient(180deg,#0f0c08 0%,#0a0806 100%);
   border-bottom:1px solid var(--border);z-index:10;
   position:relative;
@@ -575,7 +615,7 @@ html,body{
   30%{transform:translate(-50%,10px) scale(1) rotate(-1deg);}
   100%{transform:translate(-50%,120px) scale(.9) rotate(1deg);opacity:0;}
 }
-.hint{display:none !important;}
+
 
 /* Marathon badge */
 .marathon-badge{
@@ -2521,15 +2561,19 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
       <div class="stage" id="stage">
         <canvas id="gameCanvas"></canvas>
 
-        <div class="particles-layer" id="particles-layer"></div>
+<div class="particles-layer" id="particles-layer"></div>
         <div class="coins-layer" id="coins-layer"></div>
         <div class="falling-words" id="falling-words"></div>
+
+        <div class="hint" id="hint">ЗАЖМИ ЭКРАН</div>
 
         <div class="marathon-badge" id="marathon-badge">
           <span class="mb-icon">🔥</span>
           <span class="mb-text">МАРАФОН ×3</span>
           <span class="mb-time" id="marathon-time">10с</span>
         </div>
+
+        <div class="golden-barrel" id="golden-barrel" onclick="tapGoldenBarrel()">🛢️</div>
 
         <div class="buffs-bar" id="buffs-bar"></div>
 
@@ -2866,7 +2910,7 @@ if (tg) {
   tg.ready();
   tg.expand();
   try { tg.enableClosingConfirmation(); } catch(e){}
-  try { tg.requestFullscreen?.(); } catch(e){}
+
   try { tg.lockOrientation?.('portrait'); } catch(e){}
   if (tg.initDataUnsafe?.user) tgUser = tg.initDataUnsafe.user;
   setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
@@ -3730,10 +3774,11 @@ function loop(now){
   tick(dt);
   updateHUD();
 
-  achCooldown -= dt;
+achCooldown -= dt;
   if (achCooldown <= 0){
     achCooldown = 1000;
     checkMarathon();
+    if (typeof checkGoldenBarrel === 'function') checkGoldenBarrel();
   }
 
   profileCooldown -= dt;
@@ -4345,6 +4390,14 @@ function renderProfile(){
   renderPrestigePanel();
   renderDailyPanel();
   renderAchievements();
+
+  // ВОТ ЭТИХ ВЫЗОВОВ НЕ ХВАТАЛО — ТЕПЕРЬ ВСЁ ПОЯВИТСЯ:
+  if (typeof renderQuestsPanel === 'function') renderQuestsPanel();
+  if (typeof renderRoulettePanel === 'function') renderRoulettePanel();
+  if (typeof renderCollectionPanel === 'function') renderCollectionPanel();
+  if (typeof renderSecretPanel === 'function') renderSecretPanel();
+  if (typeof renderAchRewardPanel === 'function') renderAchRewardPanel();
+  if (typeof renderSettingsPanel === 'function') renderSettingsPanel();
 }
 
 function renderLocPanel(){
