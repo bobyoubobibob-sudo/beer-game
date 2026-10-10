@@ -14,21 +14,49 @@
    ========================================================= */
 
 :root{
-  --bg:#0a0806; --bg-2:#110d09;
-  --panel:#16120d; --panel-2:#1d1812;
-  --border:#2a2318; --border-2:#3a3222;
-  --text:#f0e8d8; --dim:#8a7f6b;
-  --amber:#f5a623; --amber-2:#c97e15;
-  --gold-grad:linear-gradient(135deg,#f7c948 0%,#e08b1f 55%,#b3651a 100%);
-  --green:#7cb342; --red:#d9534f; --purple:#a566ff;
+  /* ===== ПАЛИТРА ===== */
+  --bg:#0a0806;
+  --bg-2:#0f0c08;
+  --panel:#16120d;
+  --panel-2:#1d1812;
+  --border:#26201a;
+  --border-2:#3a3228;
+
+  --text:#e8dcc4;
+  --dim:#8a7f6b;         /* ← оставил старое имя, теперь сведено к одному dim */
+  --text-dim:#8a7f6b;
+  --text-mute:#5a5040;
+
+  --amber:#f5a623;
+  --amber-2:#c97e15;
+  --gold-grad:linear-gradient(135deg,#f5a623,#f5a623);  /* сплошной янтарь вместо градиента */
+
+  --green:#7cb342;
+  --red:#d9534f;
+  --purple:#a566ff;
+
   --bar-color:#f5a623;
-  --prestige-color: #a566ff;
-  --prestige-glow: rgba(165,102,255,0.5);
-  --rar-common:    #8a7f6b;
-  --rar-rare:      #4a9eff;
-  --rar-epic:      #a566ff;
-  --rar-legendary: #f7c948;
-  --rar-mythic:    #ff36ee;
+
+  --prestige-color:#a566ff;
+  --prestige-glow:rgba(165,102,255,0.4);
+
+  --rar-common:#8a7f6b;
+  --rar-rare:#4a9eff;
+  --rar-epic:#a566ff;
+  --rar-legendary:#f5a623;
+  --rar-mythic:#ff36ee;
+
+  --r-xs:4px;
+  --r-sm:8px;
+  --r-md:12px;
+  --r-lg:18px;
+  --r-xl:24px;
+
+  --sh-btn:0 4px 0 #7a4d0f, 0 10px 28px rgba(0,0,0,.45);
+  --sh-btn-active:0 2px 0 #7a4d0f, 0 6px 16px rgba(0,0,0,.4);
+
+  --f-title:'Unbounded',sans-serif;
+  --f-body:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
@@ -66,148 +94,151 @@ html,body{
 
 /* ============ SPLASH ============ */
 #splash{
-  align-items:center;justify-content:center;text-align:center;
-  background:
-    radial-gradient(ellipse at 50% 35%,rgba(245,166,35,.35) 0%,transparent 55%),
-    radial-gradient(ellipse at 50% 95%,rgba(165,102,255,.15) 0%,transparent 60%),
-    linear-gradient(180deg,#100b06 0%,#060404 100%);
-  padding:max(calc(24px + env(safe-area-inset-top)), 32px) 20px max(calc(24px + env(safe-area-inset-bottom)), 32px);
-  position:relative;
-  overflow-y:auto;
-}
-.splash-icon{
-  font-size:84px;line-height:1;margin-bottom:12px;
-  filter:drop-shadow(0 10px 30px rgba(245,166,35,.6));
-  animation:bobble 3.5s ease-in-out infinite;
-  display:inline-block;
-}
-.splash-title{
-  font-family:'Unbounded',sans-serif;font-weight:800;
-  font-size:34px;line-height:1.05;letter-spacing:-1px;
-  text-transform:uppercase;
-  background:linear-gradient(180deg,#ffe9a8 0%,#f7c948 30%,#e08b1f 60%,#7a4510 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 3px 0 rgba(0,0,0,.65)) drop-shadow(0 0 20px rgba(245,166,35,.4));
-}
-.splash-by{
-  font-family:'Manrope',sans-serif;font-weight:600;
-  font-size:11px;letter-spacing:3px;text-transform:uppercase;
-  color:var(--dim);margin-top:12px;
-}
-.splash-tag{
-  font-size:13px;color:#c4b290;margin:18px 0 24px;
-  line-height:1.5;max-width:300px;font-weight:500;
-  position:relative;z-index:2;
-}
-.btn-play{
-  position:relative;z-index:2;
-  padding:16px 52px;border:none;border-radius:16px;
-  background:var(--gold-grad);color:#1a1005;
-  font-family:'Unbounded',sans-serif;font-weight:700;
-  font-size:18px;letter-spacing:2px;text-transform:uppercase;
-  box-shadow:0 6px 0 #7a4d0f,0 12px 30px rgba(245,166,35,.45),inset 0 1px 0 rgba(255,255,255,.5);
-  cursor:pointer;transition:transform .12s,box-shadow .2s;
-  animation:pulseGlow 2.5s ease-in-out infinite;
+  align-items:center;justify-content:space-between;text-align:center;
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at 50% 42%,#1a1410 0%,#0a0806 55%,#050302 100%);
+  padding:max(calc(48px + env(safe-area-inset-top)), 64px) 24px max(calc(32px + env(safe-area-inset-bottom)), 48px);
   overflow:hidden;
 }
+
+/* вигнетка — статичная, ноль батареи */
 #splash::before{
-  content:'';position:absolute;top:10%;left:-25%;
-  width:75%;height:50%;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,166,35,.25),transparent 70%);
-  filter:blur(60px);pointer-events:none;
-  animation:floatBlob 8s ease-in-out infinite;
+  content:'';
+  position:absolute;inset:0;pointer-events:none;
+  z-index:0;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.55) 100%);
 }
+
+/* зерно — статичная SVG-текстура, ноль батареи */
 #splash::after{
-  content:'';position:absolute;bottom:15%;right:-20%;
-  width:70%;height:55%;border-radius:50%;
-  background:radial-gradient(circle,rgba(165,102,255,.2),transparent 70%);
-  filter:blur(70px);pointer-events:none;
-  animation:floatBlob 10s ease-in-out infinite reverse;
-}
-@keyframes floatBlob{
-  0%,100%{transform:translate(0,0) scale(1);}
-  50%{transform:translate(20px,-15px) scale(1.15);}
+  content:'';
+  position:absolute;inset:0;pointer-events:none;
+  z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity:.06;
+  mix-blend-mode:overlay;
 }
 
-.splash-logo{
-  margin-bottom:20px;position:relative;z-index:2;
-  animation:logoIn 1s cubic-bezier(.2,.8,.2,1);
-}
-@keyframes logoIn{
-  0%{opacity:0;transform:scale(.7) translateY(20px);}
-  100%{opacity:1;transform:scale(1) translateY(0);}
+/* верхний блок */
+.splash-top{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  flex:1;justify-content:center;width:100%;
 }
 
-.splash-icon{
-  font-size:120px;line-height:1;margin-bottom:18px;
-  filter:drop-shadow(0 10px 40px rgba(245,166,35,.7))
-         drop-shadow(0 0 60px rgba(245,166,35,.4));
-  animation:bobble 3.5s ease-in-out infinite;
-  display:inline-block;
-}
-@keyframes bobble{
-  0%,100%{transform:translateY(0) rotate(-3deg);}
-  50%{transform:translateY(-12px) rotate(3deg);}
+/* SVG-логотип */
+.splash-mark{
+  width:76px;height:76px;
+  color:var(--amber);
+  margin-bottom:28px;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  opacity:0;
+  transform:translateY(6px);
+  animation:reveal .6s cubic-bezier(.2,.8,.2,1) .05s forwards;
 }
 
+/* заголовок — сплошной цвет */
 .splash-title{
-  font-family:'Unbounded',sans-serif;font-weight:800;
-  font-size:46px;line-height:.95;letter-spacing:-1.5px;
+  font-family:var(--f-title);
+  font-weight:800;
+  font-size:clamp(36px, 11vw, 48px);
+  line-height:.92;
+  letter-spacing:.01em;
   text-transform:uppercase;
-  background:linear-gradient(180deg,#ffe9a8 0%,#f7c948 30%,#e08b1f 60%,#7a4510 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 4px 0 rgba(0,0,0,.65)) drop-shadow(0 0 30px rgba(245,166,35,.5));
+  color:var(--text);
+  margin:0;
+  opacity:0;
+  transform:translateY(10px);
+  animation:reveal .6s cubic-bezier(.2,.8,.2,1) .18s forwards;
 }
 .splash-title span{display:block;}
+.splash-title .accent{color:var(--amber);}
 
-.splash-by{
-  font-family:'Manrope',sans-serif;font-weight:600;
-  font-size:12px;letter-spacing:4px;text-transform:uppercase;
-  color:var(--dim);margin-top:22px;
+/* разделитель — растёт один раз */
+.splash-divider{
+  width:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--border-2),transparent);
+  margin:26px 0 22px;
+  animation:dividerGrow .7s cubic-bezier(.2,.8,.2,1) .4s forwards;
 }
-.splash-by b{color:var(--amber);font-weight:800;}
+@keyframes dividerGrow{to{width:180px;}}
 
-.splash-tag{
-  font-size:14px;color:#c4b290;margin:30px 0 36px;
-  line-height:1.6;max-width:320px;font-weight:500;
+/* хук */
+.splash-hook{
+  font-family:var(--f-title);
+  font-weight:600;
+  font-size:15px;
+  letter-spacing:.06em;
+  color:var(--text);
+  margin:0 0 6px;
+  text-transform:uppercase;
+  opacity:0;
+  transform:translateY(6px);
+  animation:reveal .5s cubic-bezier(.2,.8,.2,1) .5s forwards;
+}
+
+/* подпись */
+.splash-sub{
+  font-family:var(--f-body);
+  font-weight:300;
+  font-size:13px;
+  letter-spacing:.04em;
+  color:var(--text-dim);
+  margin:0;
+  opacity:0;
+  animation:reveal .5s cubic-bezier(.2,.8,.2,1) .6s forwards;
+}
+
+@keyframes reveal{
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* нижний блок */
+.splash-bottom{
   position:relative;z-index:2;
+  width:100%;
+  display:flex;flex-direction:column;align-items:center;
+  gap:18px;
 }
 
+/* кнопка — сплошной янтарь, без infinite */
 .btn-play{
-  position:relative;z-index:2;
-  padding:20px 68px;border:none;border-radius:18px;
-  background:var(--gold-grad);color:#1a1005;
-  font-family:'Unbounded',sans-serif;font-weight:700;
-  font-size:20px;letter-spacing:3px;text-transform:uppercase;
-  box-shadow:0 7px 0 #7a4d0f,0 14px 40px rgba(245,166,35,.5),inset 0 2px 0 rgba(255,255,255,.5);
-  cursor:pointer;transition:transform .12s,box-shadow .2s;
-  animation:pulseGlow 2.5s ease-in-out infinite;
-  overflow:hidden;
+  width:100%;max-width:320px;
+  padding:18px 24px;
+  border:none;
+  border-radius:var(--r-md);
+  background:var(--amber);
+  color:#1a1005;
+  font-family:var(--f-title);
+  font-weight:700;
+  font-size:15px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:var(--sh-btn);
+  transition:transform .12s ease-out, box-shadow .12s ease-out;
+  opacity:0;
+  transform:translateY(14px);
+  animation:reveal .55s cubic-bezier(.2,.8,.2,1) .72s forwards;
 }
-.btn-play::after{
-  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
-  animation:shimmer 3s ease-in-out infinite;
+.btn-play:active{
+  transform:translateY(3px);
+  box-shadow:var(--sh-btn-active);
 }
-@keyframes shimmer{
-  0%{left:-100%;}
-  50%{left:150%;}
-  100%{left:150%;}
-}
-@keyframes pulseGlow{
-  0%,100%{box-shadow:0 7px 0 #7a4d0f,0 14px 40px rgba(245,166,35,.5),inset 0 2px 0 rgba(255,255,255,.5);}
-  50%    {box-shadow:0 7px 0 #7a4d0f,0 14px 55px rgba(245,166,35,.95),inset 0 2px 0 rgba(255,255,255,.5);}
-}
-.btn-play:active{transform:translateY(4px);}
 
-.splash-footer{
-  position:absolute;bottom:calc(22px + env(safe-area-inset-bottom));
-  font-family:'Manrope',sans-serif;font-size:10px;
-  letter-spacing:3px;text-transform:uppercase;
-  color:#4d4433;font-weight:700;
+/* подпись автора */
+.splash-by{
+  font-family:var(--f-body);
+  font-weight:500;
+  font-size:10px;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--text-mute);
+  opacity:0;
+  animation:reveal .5s ease-out .9s forwards;
 }
+.splash-by b{color:var(--amber-2);font-weight:700;}
 
 /* ============ ONBOARDING ============ */
 #onboarding{
@@ -2007,8 +2038,6 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
 /* ============ ИМПЕРИЯ ============ */
 #screen-imperia{
   background:#0a0806;
-  position:relative;
-  overflow:hidden;
 }
 .imperia-hud{
   display:flex;
@@ -2482,14 +2511,46 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
      ЭКРАН 1: SPLASH
      ============================================ -->
 <div id="splash" class="setup active">
-  <div class="splash-logo">
-    <div class="splash-icon">🍺</div>
-    <div class="splash-title"><span>ПИВНОЙ</span><span>БАРОН</span></div>
+
+  <div class="splash-top">
+
+    <!-- SVG-логотип: кружка с пеной, line-art -->
+    <svg class="splash-mark" viewBox="0 0 80 80" fill="none"
+         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- корпус кружки -->
+      <path d="M18 32 L18 66 Q18 72 24 72 L52 72 Q58 72 58 66 L58 32 Z"
+            stroke="currentColor" stroke-width="2.2"/>
+      <!-- ручка -->
+      <path d="M58 42 Q72 42 72 54 Q72 66 58 66"
+            stroke="currentColor" stroke-width="2.2"/>
+      <!-- пена -->
+      <path d="M16 32 Q14 24 22 22 Q24 16 32 18 Q38 12 46 18 Q56 18 58 26 Q60 30 58 32"
+            stroke="currentColor" stroke-width="2.2"/>
+      <!-- пузырьки -->
+      <circle cx="30" cy="46" r="1.4" fill="currentColor"/>
+      <circle cx="42" cy="54" r="1" fill="currentColor"/>
+      <circle cx="34" cy="60" r="1.2" fill="currentColor"/>
+    </svg>
+
+    <!-- заголовок -->
+    <h1 class="splash-title">
+      <span>Пивной</span>
+      <span class="accent">Барон</span>
+    </h1>
+
+    <div class="splash-divider"></div>
+
+    <!-- хук -->
+    <p class="splash-hook">Империя ждёт тебя</p>
+    <p class="splash-sub">От квартиры → До яхты</p>
+
+  </div>
+
+  <div class="splash-bottom">
+    <button class="btn-play" onclick="goToSelect()">НАЧАТЬ</button>
     <div class="splash-by">by <b>Glukhov Evgeniy</b></div>
   </div>
-  <div class="splash-tag">Зажми экран, держи идеальный поток и стань легендой пивной империи</div>
-  <button class="btn-play" onclick="goToSelect()">ИГРАТЬ</button>
-  <div class="splash-footer">Разработка игры Gluhoff Digital</div>
+
 </div>
 
 <!-- ============================================
