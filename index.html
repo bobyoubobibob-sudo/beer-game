@@ -59,14 +59,25 @@
   --f-body:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  touch-action:manipulation;
+}
 
 html,body{
-  height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  height:100%;height:100dvh;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
   position:fixed;inset:0;
-  touch-action:manipulation;
   -webkit-text-size-adjust:100%;
+  touch-action:pan-x pan-y;
   -webkit-touch-callout:none;
   font-feature-settings:"tnum" 1;
   overscroll-behavior:none;
@@ -77,7 +88,9 @@ html,body{
 .font-title{font-family:'Unbounded',sans-serif;font-weight:700;letter-spacing:0;}
 
 #app{
-  width:100vw;height:100vh;max-width:540px;margin:0 auto;
+  width:100vw;max-width:540px;margin:0 auto;
+  height:100vh;
+  height:100dvh; /* правильная высота на мобильных с адресной строкой */
   display:flex;flex-direction:column;position:relative;
   background:var(--bg);overflow:hidden;
 }
@@ -551,7 +564,7 @@ html,body{
 }
 .prestige-chip{
   display:none;padding:4px 7px;border-radius:20px;
-  background:linear-gradient(135deg,var(--prestige-color),color-mix(in srgb, var(--prestige-color) 60%, #000));
+  background:var(--prestige-color);
   font-family:'Unbounded',sans-serif;font-size:9px;font-weight:700;
   color:#fff;
   box-shadow:0 0 12px var(--prestige-glow);
@@ -672,8 +685,54 @@ html,body{
 }
 .mb-time{font-size:11px;font-weight:700;color:#ffe6b0;min-width:32px;text-align:right;}
 
-/* Choke overlay — скрыт */
-.choke-overlay{display:none !important;}
+/* ==== Choke — эффект поперхнулся ==== */
+.stage.choking{
+  animation:chokeWobble .55s ease-in-out infinite;
+  filter:saturate(.85) brightness(.92);
+}
+@keyframes chokeWobble{
+  0%,100%{transform:rotate(-1.5deg) translateY(0);}
+  50%    {transform:rotate(1.5deg) translateY(-3px);}
+}
+
+.choke-overlay{
+  position:absolute;inset:0;
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;
+  pointer-events:none;z-index:20;
+  background:radial-gradient(circle at 50% 45%, rgba(217,83,79,.22) 0%, transparent 60%);
+}
+.choke-overlay.on{
+  display:flex;
+  animation:chokeIn .35s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes chokeIn{
+  0%{opacity:0;transform:scale(.85);}
+  100%{opacity:1;transform:scale(1);}
+}
+.choke-icon{
+  font-size:76px;line-height:1;
+  filter:drop-shadow(0 6px 20px rgba(0,0,0,.7));
+  animation:chokeSpin 1.4s ease-in-out infinite;
+}
+@keyframes chokeSpin{
+  0%  {transform:rotate(-8deg);}
+  50% {transform:rotate(8deg);}
+  100%{transform:rotate(-8deg);}
+}
+.choke-text{
+  font-family:var(--f-title, 'Unbounded', sans-serif);
+  font-weight:800;font-size:22px;letter-spacing:.06em;
+  text-transform:uppercase;
+  color:#ff8a85;
+  text-shadow:0 3px 0 rgba(0,0,0,.65),0 0 22px rgba(217,83,79,.7);
+}
+.choke-sub{
+  font-family:var(--f-body, 'Manrope', sans-serif);
+  font-weight:600;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#c4a874;opacity:.85;
+}
 
 /* Buffs bar */
 .buffs-bar{
@@ -772,20 +831,15 @@ html,body{
   100%{background-position:-30px -50px,20px -40px,-15px -60px,25px -35px,-20px -55px;}
 }
 .track-fill{
-  position:absolute;left:0;top:0;bottom:0;width:0%;
-  background:linear-gradient(180deg,var(--bar-color) 0%,color-mix(in srgb,var(--bar-color) 70%,#000) 100%);
-  box-shadow:0 0 20px var(--bar-color),inset 0 -3px 6px rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.25);
-  border-radius:12px 0 0 12px;
-  transition:width .04s linear,background .3s ease;
-  overflow:hidden;
+  position:absolute;left:0;top:0;bottom:0;
+  width:100%;
+  background:var(--bar-color);
+  border-radius:12px;
+  transform:scaleX(0);
+  transform-origin:left center;
+  will-change:transform;
+  box-shadow:0 0 18px var(--bar-color),inset 0 -2px 4px rgba(0,0,0,.25),inset 0 2px 0 rgba(255,255,255,.25);
 }
-.track-fill::after{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(90deg,transparent 0 8px,rgba(255,255,255,.15) 8px 10px);
-  animation:flowLines 1s linear infinite;
-  opacity:.6;
-}
-@keyframes flowLines{from{transform:translateX(0);}to{transform:translateX(18px);}}
 .sweet-zone{
   position:absolute;left:40%;width:35%;top:0;bottom:0;
   background:linear-gradient(180deg,rgba(164,216,96,.2) 0%,rgba(124,179,66,.28) 50%,rgba(74,122,31,.2) 100%);
@@ -1195,8 +1249,8 @@ html,body{
 .tabbar button{
   background:none;border:none;color:var(--dim);
   padding:10px 2px 8px;
-  font-family:'Manrope';font-size:9px;font-weight:800;
-  letter-spacing:.6px;text-transform:uppercase;
+  font-family:'Manrope';font-size:8px;font-weight:800;
+  letter-spacing:.3px;text-transform:uppercase;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;
   position:relative;cursor:pointer;transition:color .2s;
@@ -2081,28 +2135,32 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
   flex:1;
   position:relative;
   overflow:hidden;
-  touch-action:none;
-  cursor:grab;
   background:#050302;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
 }
-.imperia-viewport.dragging{cursor:grabbing;}
 .imperia-canvas{
-  position:absolute;
-  top:0;left:0;
-  width:2000px;
-  height:2000px;
-  transform-origin:0 0;
-  will-change:transform;
+  position:relative;
+  aspect-ratio:1 / 1;
+  width:100%;
+  max-width:100%;
+  max-height:100%;
   background-image:url('https://raw.githubusercontent.com/bobyoubobibob-sudo/beer-game/main/images/bg.jpg');
   background-size:cover;
   background-position:center;
-  filter:brightness(.55) saturate(1.1);
+  filter:brightness(.62) saturate(1.05);
+  border-radius:var(--r-lg, 18px);
+  overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,.6), inset 0 0 0 1px rgba(245,166,35,.15);
 }
-.imperia-canvas::after{
+.imperia-canvas:after{
   content:'';
   position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(0,0,0,.65) 100%);
+  background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(0,0,0,.55) 100%);
   pointer-events:none;
+  border-radius:inherit;
 }
 .imperia-building{
   position:absolute;
@@ -2163,47 +2221,7 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
   border-color:var(--amber);
   color:var(--amber);
 }
-.imperia-controls{
-  position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  display:flex;flex-direction:column;gap:8px;
-  z-index:10;
-}
-.imperia-ctrl-btn{
-  width:42px;height:42px;
-  border-radius:50%;
-  background:rgba(15,12,8,.92);
-  border:1px solid var(--border-2);
-  color:var(--amber);
-  font-size:18px;font-weight:900;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  backdrop-filter:blur(8px);
-  box-shadow:0 4px 12px rgba(0,0,0,.6);
-  transition:transform .1s;
-  user-select:none;
-}
-.imperia-ctrl-btn:active{transform:scale(.9);background:rgba(245,166,35,.2);}
-.imperia-hint{
-  position:absolute;
-  bottom:14px;left:50%;
-  transform:translateX(-50%);
-  padding:6px 14px;
-  border-radius:16px;
-  background:rgba(15,12,8,.92);
-  border:1px solid var(--border-2);
-  font-family:'Manrope',sans-serif;
-  font-size:10px;font-weight:700;
-  color:#c4a874;
-  letter-spacing:.5px;
-  pointer-events:none;
-  z-index:10;
-  text-transform:uppercase;
-  transition:opacity .5s;
-}
-.imperia-hint.hide{opacity:0;}
+
 
 /* Имперская модалка */
 .imperia-modal{max-width:400px;padding:0;overflow:hidden;}
@@ -2503,6 +2521,712 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
   font-size:12px;margin-bottom:6px;
 }
 .battle-score-row:last-child{margin-bottom:0;}
+/* ==== Floating-кнопки на игровом экране ==== */
+.game-quickbar{
+  position:absolute;
+  top:12px;
+  right:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:8;
+}
+.quick-btn{
+  width:56px;
+  height:56px;
+  border-radius:12px;
+  background:rgba(15,12,8,.85);
+  border:1px solid var(--border-2);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  box-shadow:0 4px 12px rgba(0,0,0,.5);
+  transition:transform .12s ease-out;
+  padding:0;
+}
+.quick-btn:active{ transform:scale(.92); }
+.quick-btn .quick-ico{
+  font-size:22px;
+  line-height:1;
+}
+.quick-btn .quick-label{
+  font-family:var(--f-body);
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.4px;
+  text-transform:uppercase;
+  color:var(--text-mute);
+}
+.quick-btn.boss{
+  border-color:rgba(217,83,79,.5);
+  box-shadow:0 4px 12px rgba(0,0,0,.5),0 0 14px rgba(217,83,79,.35);
+}
+.quick-btn.boss .quick-label{ color:#ff8a85; }
+
+/* ==== Battle arena — ловля кружек ==== */
+.battle-arena{
+  position:relative;
+  height:340px;
+  background:linear-gradient(180deg,#1a0808 0%,#0a0404 100%);
+  border-radius:12px;
+  overflow:hidden;
+  touch-action:none;
+  box-shadow:inset 0 0 0 1px rgba(217,67,67,.25),inset 0 8px 20px rgba(0,0,0,.4);
+}
+
+.battle-mug{
+  position:absolute;
+  top:-60px;
+  font-size:44px;
+  line-height:1;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));
+  animation-name:mugFall;
+  animation-timing-function:linear;
+  animation-fill-mode:forwards;
+  z-index:2;
+  will-change:transform;
+}
+@keyframes mugFall{
+  from{ transform:translateY(0) rotate(-8deg); }
+  to  { transform:translateY(420px) rotate(14deg); }
+}
+
+.battle-mug.caught{
+  animation:caughtPop .3s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes caughtPop{
+  0%  { transform:scale(1); opacity:1; }
+  60% { transform:scale(1.6); opacity:1; filter:drop-shadow(0 0 20px #f7c948); }
+  100%{ transform:scale(0.2); opacity:0; }
+}
+
+.battle-score-row-top{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+.battle-score-chip{
+  flex:1;
+  padding:8px 12px;
+  border-radius:10px;
+  background:rgba(124,179,66,.1);
+  border:1px solid rgba(124,179,66,.4);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.battle-score-chip.bot{
+  background:rgba(217,67,67,.1);
+  border-color:rgba(217,67,67,.4);
+}
+.battle-score-chip .name{
+  font-family:var(--f-body);
+  font-size:11px;
+  font-weight:800;
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+}
+.battle-score-chip .score{
+  font-family:var(--f-title);
+  font-size:18px;
+  font-weight:800;
+  color:#7cb342;
+  flex-shrink:0;
+  text-shadow:0 0 10px rgba(124,179,66,.5);
+}
+.battle-score-chip.bot .score{
+  color:#d94343;
+  text-shadow:0 0 10px rgba(217,67,67,.5);
+}
+/* ==== Босс дня — модалка ==== */
+.boss-modal{ max-width:420px; padding:0; overflow:hidden; }
+.boss-header{
+  padding:20px;
+  text-align:center;
+  background:linear-gradient(135deg,#2a0d0d,#1a0808);
+  border-bottom:2px solid #d94343;
+  position:relative;
+}
+.boss-emoji{
+  font-size:64px;
+  line-height:1;
+  margin-bottom:8px;
+  filter:drop-shadow(0 6px 20px rgba(217,67,67,.5));
+  animation:bossBreathe 2.5s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes bossBreathe{
+  0%,100%{ transform:scale(1); }
+  50%    { transform:scale(1.08); }
+}
+.boss-name{
+  font-family:var(--f-title);
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+  color:#fff;
+}
+.boss-title{
+  font-family:var(--f-body);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:#c49090;
+  margin-top:4px;
+}
+.boss-body{
+  padding:18px 20px 22px;
+  background:linear-gradient(180deg,#1a0808,#0a0404);
+}
+.boss-desc{
+  font-family:var(--f-body);
+  font-size:12px;
+  color:#c49090;
+  line-height:1.5;
+  margin-bottom:16px;
+  text-align:center;
+}
+.boss-hp-bar{
+  position:relative;
+  height:36px;
+  border-radius:10px;
+  background:#0a0404;
+  overflow:hidden;
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.8),0 0 0 1px rgba(217,67,67,.3);
+  margin-bottom:6px;
+}
+.boss-hp-fill{
+  height:100%;
+  background:linear-gradient(90deg,#d94343,#ff6b6b);
+  box-shadow:0 0 20px rgba(217,67,67,.7);
+  transition:width .4s ease-out;
+  position:relative;
+}
+.boss-hp-fill::after{
+  content:'';
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 20px,rgba(255,255,255,.08) 20px 22px);
+  pointer-events:none;
+}
+.boss-hp-fill.phase2{
+  background:linear-gradient(90deg,#ff8a1a,#ffb066);
+  box-shadow:0 0 20px rgba(255,138,26,.7);
+}
+.boss-hp-fill.phase3{
+  background:linear-gradient(90deg,#a566ff,#d9c2ff);
+  box-shadow:0 0 24px rgba(165,102,255,.8);
+}
+.boss-hp-text{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--f-title);
+  font-size:13px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:.05em;
+  text-shadow:0 2px 4px rgba(0,0,0,.8);
+  z-index:2;
+}
+.boss-stats{
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--f-body);
+  font-size:10px;
+  font-weight:700;
+  color:#c49090;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+.boss-actions{
+  display:flex;
+  gap:8px;
+}
+.boss-actions button{
+  flex:1;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-family:var(--f-title);
+  font-weight:800;
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:transform .1s;
+  position:relative;
+  overflow:hidden;
+}
+.boss-actions .btn-boss-fight{
+  background:var(--amber);
+  color:#1a1005;
+  box-shadow:0 4px 0 #7a4d0f;
+}
+.boss-actions .btn-boss-fight:active{
+  transform:translateY(2px);
+  box-shadow:0 2px 0 #7a4d0f;
+}
+.boss-actions .btn-boss-fight:disabled{
+  background:#241a10;
+  color:#5a4a30;
+  box-shadow:none;
+  cursor:not-allowed;
+}
+.boss-actions .btn-boss-close{
+  flex:0 0 96px;
+  background:var(--panel-2);
+  color:var(--dim);
+  border:1px solid var(--border-2);
+}
+.boss-reward{
+  margin-top:14px;
+  padding:10px 12px;
+  border-radius:10px;
+  background:rgba(245,166,35,.08);
+  border:1px solid rgba(245,166,35,.35);
+  font-family:var(--f-body);
+  font-size:11px;
+  color:#c4a874;
+  font-weight:700;
+  text-align:center;
+}
+.boss-reward b{ color:var(--amber); font-weight:800; }
+.boss-timer{
+  font-family:var(--f-title);
+  font-size:11px;
+  font-weight:700;
+  color:#8a7f6b;
+  text-align:center;
+  margin-top:10px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+/* ============ АРЕНА БОССА ============ */
+#boss-arena{
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(217,67,67,.15) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,0,0,.9) 0%, transparent 70%),
+    linear-gradient(180deg,#1a0808 0%,#0a0404 100%);
+}
+
+.ba-hud{
+  padding:calc(14px + env(safe-area-inset-top)) 16px 10px;
+  background:linear-gradient(180deg,rgba(15,12,8,.95),rgba(10,8,6,.7));
+  border-bottom:1px solid rgba(217,67,67,.35);
+  position:relative;
+  z-index:10;
+}
+.ba-hud-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.ba-close{
+  width:38px;height:38px;
+  border-radius:50%;
+  background:rgba(15,12,8,.85);
+  border:1px solid var(--border-2);
+  color:var(--text);
+  font-size:22px;
+  font-weight:700;
+  line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  padding:0;
+  transition:transform .1s;
+  flex-shrink:0;
+}
+.ba-close:active{ transform:scale(.9); }
+.ba-title{
+  flex:1;
+  text-align:center;
+  font-family:var(--f-body);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:#c49090;
+}
+.ba-spacer{ width:38px; flex-shrink:0; }
+
+.ba-boss-name{
+  font-family:var(--f-title);
+  font-size:18px;
+  font-weight:800;
+  color:#fff;
+  text-transform:uppercase;
+  letter-spacing:-.01em;
+  text-align:center;
+  margin-bottom:2px;
+}
+.ba-boss-phase{
+  font-family:var(--f-body);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:#ff8a85;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.ba-hp-wrap{
+  position:relative;
+  height:22px;
+  border-radius:8px;
+  background:#0a0404;
+  overflow:hidden;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.9),0 0 0 1px rgba(217,67,67,.35);
+}
+.ba-hp-fill{
+  height:100%;
+  background:linear-gradient(90deg,#d94343,#ff6b6b);
+  box-shadow:0 0 16px rgba(217,67,67,.7);
+  transition:width .15s ease-out;
+  border-radius:8px;
+}
+.ba-hp-fill.phase2{
+  background:linear-gradient(90deg,#ff8a1a,#ffb066);
+  box-shadow:0 0 16px rgba(255,138,26,.8);
+}
+.ba-hp-fill.phase3{
+  background:linear-gradient(90deg,#a566ff,#d9c2ff);
+  box-shadow:0 0 18px rgba(165,102,255,.9);
+}
+.ba-hp-text{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-title);
+  font-size:11px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:.05em;
+  text-shadow:0 1px 3px rgba(0,0,0,.9);
+  z-index:2;
+}
+
+.ba-stage{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  touch-action:manipulation;
+  cursor:crosshair;
+}
+
+.ba-boss{
+  position:absolute;
+  top:32%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  font-size:clamp(110px, 32vw, 160px);
+  line-height:1;
+  user-select:none;
+  pointer-events:none;
+  filter:drop-shadow(0 12px 40px rgba(217,67,67,.6)) drop-shadow(0 4px 0 rgba(0,0,0,.5));
+  animation:baBossIdle 3s ease-in-out infinite;
+  z-index:3;
+}
+@keyframes baBossIdle{
+  0%,100%{ transform:translate(-50%,-50%) scale(1); }
+  50%    { transform:translate(-50%,-50%) scale(1.06); }
+}
+.ba-boss.hit{
+  animation:baBossHit .3s ease-out;
+}
+@keyframes baBossHit{
+  0%  { transform:translate(-50%,-50%) scale(1); filter:drop-shadow(0 0 30px #f7c948); }
+  30% { transform:translate(-50%,-50%) scale(.88) rotate(-4deg); filter:drop-shadow(0 0 60px #f7c948); }
+  60% { transform:translate(-50%,-50%) scale(1.06) rotate(3deg); }
+  100%{ transform:translate(-50%,-50%) scale(1); }
+}
+.ba-boss.rage{
+  animation:baBossRage 1s ease-in-out infinite;
+}
+@keyframes baBossRage{
+  0%,100%{ transform:translate(-50%,-50%) scale(1) rotate(-2deg); }
+  50%    { transform:translate(-50%,-50%) scale(1.08) rotate(2deg); }
+}
+
+/* Летящая кружка */
+.ba-beer{
+  position:absolute;
+  font-size:44px;
+  line-height:1;
+  pointer-events:none;
+  user-select:none;
+  z-index:5;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.6));
+  animation:baBeerFly .42s cubic-bezier(.35,.1,.55,1) forwards;
+}
+@keyframes baBeerFly{
+  0%  { transform:translate(-50%,-50%) rotate(0) scale(.5); opacity:0; }
+  15% { opacity:1; }
+  100%{ transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) rotate(720deg) scale(1); opacity:1; }
+}
+
+/* Попадание — вспышка */
+.ba-hit-flash{
+  position:absolute;
+  top:32%; left:50%;
+  transform:translate(-50%,-50%);
+  width:180px; height:180px;
+  border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#f7c948 30%,transparent 70%);
+  pointer-events:none;
+  animation:baFlash .45s ease-out forwards;
+  z-index:4;
+}
+@keyframes baFlash{
+  0%  { transform:translate(-50%,-50%) scale(.2); opacity:1; }
+  100%{ transform:translate(-50%,-50%) scale(1.6); opacity:0; }
+}
+
+/* Всплывающий урон */
+.ba-dmg{
+  position:absolute;
+  font-family:var(--f-title);
+  font-weight:800;
+  font-size:22px;
+  color:#f7c948;
+  text-shadow:0 2px 6px rgba(0,0,0,.9), 0 0 12px rgba(247,201,72,.7);
+  pointer-events:none;
+  z-index:6;
+  animation:baDmgFloat .9s cubic-bezier(.2,.8,.2,1) forwards;
+  white-space:nowrap;
+}
+.ba-dmg.crit{
+  font-size:28px;
+  color:#ff36ee;
+  text-shadow:0 2px 8px rgba(0,0,0,.9), 0 0 16px rgba(255,54,238,.8);
+}
+@keyframes baDmgFloat{
+  0%  { transform:translate(-50%,-50%) scale(.5); opacity:0; }
+  20% { transform:translate(-50%,-70%) scale(1.15); opacity:1; }
+  100%{ transform:translate(-50%,-180%) scale(.9); opacity:0; }
+}
+
+/* Промах */
+.ba-miss{
+  position:absolute;
+  font-family:var(--f-body);
+  font-size:12px;
+  font-weight:800;
+  color:#8a7f6b;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  pointer-events:none;
+  z-index:6;
+  animation:baMissFloat .8s ease-out forwards;
+}
+@keyframes baMissFloat{
+  0%  { transform:translate(-50%,-50%) scale(.8); opacity:0; }
+  20% { transform:translate(-50%,-60%) scale(1); opacity:.8; }
+  100%{ transform:translate(-50%,-160%) scale(.9); opacity:0; }
+}
+
+.ba-bottom{
+  padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(10,8,6,.7),rgba(5,3,2,.95));
+  border-top:1px solid rgba(217,67,67,.35);
+  z-index:10;
+}
+.ba-hint{
+  font-family:var(--f-body);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#c4a874;
+  text-align:center;
+  margin-bottom:10px;
+  line-height:1.4;
+}
+.ba-hint b{ color:var(--amber); font-weight:800; }
+
+.ba-counter{
+  display:flex;
+  justify-content:space-between;
+  font-family:var(--f-body);
+  font-size:10px;
+  font-weight:800;
+  color:#8a7f6b;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.ba-counter .ba-crit{ color:#ff36ee; }
+
+/* Экран поражения босса */
+.ba-victory{
+  position:absolute;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  background:radial-gradient(circle at 50% 45%, rgba(247,201,72,.25) 0%, rgba(5,3,2,.92) 60%);
+  z-index:20;
+  padding:24px;
+  text-align:center;
+}
+.ba-victory.on{ display:flex; animation:baVicIn .4s ease-out; }
+@keyframes baVicIn{
+  from{ opacity:0; } to{ opacity:1; }
+}
+.ba-vic-icon{ font-size:90px; line-height:1; margin-bottom:12px; animation:baBossIdle 1.5s ease-in-out infinite; }
+.ba-vic-title{
+  font-family:var(--f-title);
+  font-size:26px;
+  font-weight:800;
+  color:#f7c948;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  text-shadow:0 0 20px rgba(247,201,72,.6);
+}
+.ba-vic-sub{
+  font-family:var(--f-body);
+  font-size:13px;
+  color:#c4a874;
+  font-weight:600;
+  line-height:1.5;
+  margin-bottom:22px;
+}
+.ba-vic-btn{
+  padding:16px 40px;
+  border:none;
+  border-radius:12px;
+  background:var(--amber);
+  color:#1a1005;
+  font-family:var(--f-title);
+  font-weight:800;
+  font-size:13px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 4px 0 #7a4d0f, 0 8px 24px rgba(245,166,35,.4);
+  transition:transform .1s;
+}
+.ba-vic-btn:active{ transform:translateY(2px); box-shadow:0 2px 0 #7a4d0f; }
+
+/* ==== ИМПЕРИЯ — ЯРКИЙ РЕДИЗАЙН ==== */
+.imperia-info{
+  margin:10px 14px 8px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(245,166,35,.12) 0%, rgba(245,166,35,.03) 100%);
+  border:1px solid rgba(245,166,35,.35);
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  box-shadow:0 4px 16px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.imperia-info-icon{
+  font-size:22px;
+  line-height:1;
+  flex-shrink:0;
+  margin-top:2px;
+  filter:drop-shadow(0 0 6px rgba(245,166,35,.5));
+}
+.imperia-info-text{
+  font-family:'Manrope',sans-serif;
+  font-size:12px;
+  font-weight:600;
+  color:#e8dcc4;
+  line-height:1.5;
+}
+.imperia-info-text b{ color:var(--amber); font-weight:800; }
+.imperia-info-count{
+  display:inline-block;
+  margin-top:4px;
+  font-family:'Unbounded',sans-serif;
+  font-size:10px;
+  font-weight:700;
+  color:#8a7f6b;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+
+.imperia-viewport{
+  padding:8px 14px 14px;
+}
+.imperia-canvas{
+  filter:brightness(.88) saturate(1.2);
+  box-shadow:0 12px 40px rgba(0,0,0,.6), inset 0 0 0 1px rgba(245,166,35,.25);
+}
+.imperia-canvas:after{
+  background:radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.4) 100%);
+}
+
+.imperia-building-icon{
+  width:72px;height:72px;
+  border-radius:50%;
+  background:linear-gradient(180deg,#3a2e22,#1a1410);
+  border:3px solid #6a5230;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;line-height:1;
+  box-shadow:0 6px 20px rgba(0,0,0,.7), 0 0 0 4px rgba(0,0,0,.35), inset 0 2px 8px rgba(255,255,255,.12);
+  position:relative;
+  transition:all .2s;
+  filter:drop-shadow(0 0 8px rgba(245,166,35,.15));
+}
+.imperia-building.owned .imperia-building-icon{
+  border-color:var(--amber);
+  background:linear-gradient(180deg,#4a3820,#2a1e0e);
+  box-shadow:
+    0 0 24px rgba(245,166,35,.7),
+    0 0 0 4px rgba(245,166,35,.2),
+    0 8px 24px rgba(0,0,0,.7),
+    inset 0 2px 8px rgba(255,255,255,.15);
+  filter:drop-shadow(0 0 14px rgba(245,166,35,.5));
+}
+.imperia-building.locked .imperia-building-icon{
+  filter:grayscale(.35) brightness(.85);
+  opacity:.85;
+}
+.imperia-building.locked .imperia-building-label{
+  color:#b8a586;
+  border-color:#5a4a30;
+}
+.imperia-building-label{
+  margin-top:6px;
+  padding:4px 10px;
+  border-radius:8px;
+  background:rgba(15,12,8,.95);
+  border:1px solid rgba(245,166,35,.4);
+  font-family:'Manrope',sans-serif;
+  font-size:11px;font-weight:800;
+  color:#f0e8d8;
+  white-space:nowrap;
+  letter-spacing:.3px;
+  box-shadow:0 4px 12px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.imperia-building.owned .imperia-building-label{
+  border-color:var(--amber);
+  color:#f7c948;
+  background:rgba(26,18,8,.95);
+  box-shadow:0 4px 14px rgba(0,0,0,.75), 0 0 14px rgba(245,166,35,.35);
+}
 </style>
 </head>
 <body>
@@ -2626,7 +3350,6 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
         <div class="coins-layer" id="coins-layer"></div>
         <div class="falling-words" id="falling-words"></div>
 
-        <div class="hint" id="hint">ЗАЖМИ ЭКРАН</div>
 
         <div class="marathon-badge" id="marathon-badge">
           <span class="mb-icon">🔥</span>
@@ -2634,7 +3357,22 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
           <span class="mb-time" id="marathon-time">10с</span>
         </div>
 
-        <div class="golden-barrel" id="golden-barrel" onclick="tapGoldenBarrel()">🛢️</div>
+        <div class="choke-overlay" id="choke-overlay">
+          <div class="choke-icon">😵‍💫</div>
+          <div class="choke-text">Поперхнулся</div>
+          <div class="choke-sub">Отдышись…</div>
+        </div>
+
+        <div class="game-quickbar">
+          <button class="quick-btn" onclick="openBattle()" aria-label="Битва с ботом">
+            <span class="quick-ico">⚔️</span>
+            <span class="quick-label">Бой</span>
+          </button>
+          <button class="quick-btn boss" onclick="openBoss()" aria-label="Босс дня">
+            <span class="quick-ico">👹</span>
+            <span class="quick-label">Босс</span>
+          </button>
+        </div>
 
         <div class="buffs-bar" id="buffs-bar"></div>
 
@@ -2661,27 +3399,31 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
     </section>
 
     <!-- ===== ИМПЕРИЯ ===== -->
-    <section class="screen" id="screen-imperia">
-      <div class="imperia-hud">
-        <div class="imperia-hud-title">🏙 Империя</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span class="imperia-bonus" id="imperia-bonus">+0% к доходу</span>
-          <div class="imperia-hud-keys">
-            <span class="ico">🔑</span>
-            <span id="imperia-keys-count">0</span>
-          </div>
-        </div>
+<section class="screen" id="screen-imperia">
+  <div class="imperia-hud">
+    <div class="imperia-hud-title">🏙 Империя</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="imperia-bonus" id="imperia-bonus">+0% к доходу</span>
+      <div class="imperia-hud-keys">
+        <span class="ico">🔑</span>
+        <span id="imperia-keys-count">0</span>
       </div>
-      <div class="imperia-viewport" id="imperia-viewport">
-        <div class="imperia-canvas" id="imperia-canvas"></div>
-        <div class="imperia-controls">
-          <button class="imperia-ctrl-btn" onclick="imperiaZoom(0.25)">+</button>
-          <button class="imperia-ctrl-btn" onclick="imperiaZoom(-0.25)">−</button>
-          <button class="imperia-ctrl-btn" onclick="imperiaReset()">⟲</button>
-        </div>
-        <div class="imperia-hint" id="imperia-hint">Двумя пальцами · зум</div>
-      </div>
-    </section>
+    </div>
+  </div>
+
+  <div class="imperia-info">
+    <div class="imperia-info-icon">💡</div>
+    <div class="imperia-info-text">
+      <b>Тапай по зданиям</b> — строй и прокачивай.<br>
+      Каждое даёт <b>+%</b> к общему доходу навсегда.<br>
+      <span class="imperia-info-count" id="imperia-info-count">Построено 0 / 10</span>
+    </div>
+  </div>
+
+  <div class="imperia-viewport" id="imperia-viewport">
+    <div class="imperia-canvas" id="imperia-canvas"></div>
+  </div>
+</section>
 
     <!-- ===== TOP ===== -->
     <section class="screen" id="screen-top">
@@ -2737,7 +3479,7 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
 
   <nav class="tabbar">
     <button class="active" data-tab="game"    onclick="switchTab('game',event)"><span class="ico">🍺</span>Игра</button>
-    <button                data-tab="shop"    onclick="switchTab('shop',event)"><span class="ico">🛒</span>Улучш.</button>
+    <button                data-tab="shop"    onclick="switchTab('shop',event)"><span class="ico">🛒</span>Улучшения</button>
     <button                data-tab="imperia" onclick="switchTab('imperia',event)"><span class="ico">🏙</span>Империя</button>
     <button                data-tab="top"     onclick="switchTab('top',event)"><span class="ico">🏆</span>Топ</button>
     <button                data-tab="profile" onclick="switchTab('profile',event)"><span class="ico">👤</span>Профиль<span class="badge" id="badge-profile"></span></button>
@@ -2755,7 +3497,48 @@ body[data-theme="neon"] .tabbar button.active::before{background:#ff36ee;box-sha
 <div class="modal-bg" id="battle-modal-bg">
   <div class="modal battle-modal" id="battle-modal"></div>
 </div>
+<div class="modal-bg" id="boss-modal-bg">
+  <div class="modal boss-modal" id="boss-modal"></div>
+</div>
+<!-- ==== ПОЛНОЭКРАННАЯ АРЕНА БОССА ==== -->
+<div id="boss-arena" class="setup">
 
+  <div class="ba-hud">
+    <div class="ba-hud-top">
+      <button class="ba-close" onclick="closeBossArena()">×</button>
+      <div class="ba-title">Битва с боссом</div>
+      <div class="ba-spacer"></div>
+    </div>
+    <div class="ba-boss-name" id="ba-boss-name">Пивной Магнат</div>
+    <div class="ba-boss-phase" id="ba-boss-phase">Фаза 1</div>
+    <div class="ba-hp-wrap">
+      <div class="ba-hp-fill" id="ba-hp-fill" style="width:100%"></div>
+      <div class="ba-hp-text" id="ba-hp-text">0 / 0</div>
+    </div>
+  </div>
+
+  <div class="ba-stage" id="ba-stage">
+    <div class="ba-boss" id="ba-boss">🎩</div>
+    <div class="ba-victory" id="ba-victory">
+      <div class="ba-vic-icon">🏆</div>
+      <div class="ba-vic-title">Босс повержен!</div>
+      <div class="ba-vic-sub" id="ba-vic-sub">
+        +500 ключей<br>Кубок Босса открыт
+      </div>
+      <button class="ba-vic-btn" onclick="closeBossArena()">ЗАБРАТЬ</button>
+    </div>
+  </div>
+
+  <div class="ba-bottom">
+    <div class="ba-hint">🎯 Тапай по боссу — <b>кидай кружки!</b></div>
+    <div class="ba-counter">
+      <span>Брошено: <span id="ba-thrown">0</span></span>
+      <span>Попаданий: <span id="ba-hits">0</span></span>
+      <span class="ba-crit">Криты: <span id="ba-crits">0</span></span>
+    </div>
+  </div>
+
+</div>
 <script>
 /* =========================================================
    ЧАСТЬ 5 — ИГРОВЫЕ ДАННЫЕ
@@ -2824,14 +3607,14 @@ const getChar = id => CHARACTERS.find(c => c.id === id) || CHARACTERS[0];
 
 /* ===== ЛОКАЦИИ ===== */
 const LOCATIONS = [
-  { id:'hrush',   name:'Хрущёвка',         icon:'🏢', threshold:0,          mult:1,   priceMult:1,    bg1:'#1a1410', bg2:'#0a0806', decor:['🪑','🖼️'] },
-  { id:'pivn',    name:'Пивнушка у дома',   icon:'🍻', threshold:100,        mult:1.4, priceMult:1.3,  bg1:'#221610', bg2:'#0d0806', decor:['🍻','🪑'] },
-  { id:'garage',  name:'Гараж',             icon:'🔧', threshold:500,        mult:2,   priceMult:1.7,  bg1:'#14161a', bg2:'#080a0d', decor:['🔧','🛠️'] },
-  { id:'sport',   name:'Спортбар',          icon:'📺', threshold:3000,       mult:3,   priceMult:2.2,  bg1:'#1a1218', bg2:'#0a060a', decor:['📺','🏆'] },
-  { id:'craft',   name:'Крафтовая',         icon:'🍺', threshold:15000,      mult:4.5, priceMult:3.0,  bg1:'#171412', bg2:'#0a0806', decor:['🛢️','🍺'] },
-  { id:'premium', name:'Паб Премиум',       icon:'🥂', threshold:100000,     mult:7,   priceMult:4.5,  bg1:'#121820', bg2:'#060a10', decor:['🥂','💎'] },
-  { id:'roof',    name:'Крыша небоскрёба',  icon:'🌃', threshold:1000000,    mult:11,  priceMult:7.0,  bg1:'#0f1218', bg2:'#04060a', decor:['🌃','🌙'] },
-  { id:'yacht',   name:'Бар на яхте',       icon:'⛵', threshold:10000000,   mult:17,  priceMult:12.0, bg1:'#0d1820', bg2:'#040a10', decor:['⛵','🌊'] },
+  { id:'hrush',   name:'Хрущёвка',         icon:'🏢', threshold:0,          mult:1,   priceMult:1,    bg1:'#1a1410', bg2:'#0a0806' },
+  { id:'pivn',    name:'Пивнушка у дома',   icon:'🍻', threshold:100,        mult:1.4, priceMult:1.3,  bg1:'#221610', bg2:'#0d0806' },
+  { id:'garage',  name:'Гараж',             icon:'🔧', threshold:500,        mult:2,   priceMult:1.7,  bg1:'#14161a', bg2:'#080a0d' },
+  { id:'sport',   name:'Спортбар',          icon:'📺', threshold:3000,       mult:3,   priceMult:2.2,  bg1:'#1a1218', bg2:'#0a060a' },
+  { id:'craft',   name:'Крафтовая',         icon:'🍺', threshold:15000,      mult:4.5, priceMult:3.0,  bg1:'#171412', bg2:'#0a0806' },
+  { id:'premium', name:'Паб Премиум',       icon:'🥂', threshold:100000,     mult:7,   priceMult:4.5,  bg1:'#121820', bg2:'#060a10' },
+  { id:'roof',    name:'Крыша небоскрёба',  icon:'🌃', threshold:1000000,    mult:11,  priceMult:7.0,  bg1:'#0f1218', bg2:'#04060a' },
+  { id:'yacht',   name:'Бар на яхте',       icon:'⛵', threshold:10000000,   mult:17,  priceMult:12.0, bg1:'#0d1820', bg2:'#040a10' },
 ];
 function getCurrentLocation(){
   let loc = LOCATIONS[0];
@@ -2926,6 +3709,8 @@ const ACHIEVEMENTS = [
   { id:'imp_max1',  icon:'🔨', name:'Мастер',            desc:'Прокачать здание до 5 уровня',reward:200000, keysReward:10,  check:()=>Object.values(STATE.imperia||{}).some(x=>x.level >= 5) },
   { id:'imp_maxall',icon:'👑', name:'Император',         desc:'Все здания 5 уровня',        reward:50000000,keysReward:200, check:()=>{ const imp=STATE.imperia||{}; const ids=Object.keys(imp); return ids.length >= 10 && ids.every(id=>imp[id].level >= 5); } },
   { id:'imp_keys',  icon:'🔑', name:'Ключник',           desc:'Накопить 50 ключей',         reward:100000,  keysReward:0,   check:s=>s.keys >= 50 },
+  // ===== БОСС =====
+  { id:'boss_killer', icon:'👹', name:'Убийца Боссов',   desc:'Победить Босса дня',        reward:10000,   keysReward:0,   check:s=>s.boss && s.boss.totalDefeated >= 1 },
 ];
 
 /* ===== ПАДАЮЩИЕ СЛОВА ===== */
@@ -2987,13 +3772,35 @@ let tgUser = { id: "guest_" + Math.floor(Math.random()*100000), first_name: "Г�
 if (tg) {
   tg.ready();
   tg.expand();
+
+  // Полноэкранный режим (Bot API 8.0+)
+  try { tg.requestFullscreen?.(); } catch(e){}
+
+  // Блокировка закрытия при свайпе вниз
   try { tg.enableClosingConfirmation(); } catch(e){}
 
+  // Блокировка вертикальных свайпов (Bot API 7.7+)
+  try { tg.disableVerticalSwipes?.(); } catch(e){}
+
   try { tg.lockOrientation?.('portrait'); } catch(e){}
+
   if (tg.initDataUnsafe?.user) tgUser = tg.initDataUnsafe.user;
+
+  // Форсируем expand несколько раз — Telegram иногда капризничает
+  setTimeout(() => { try { tg.expand(); } catch(e){} }, 300);
+  setTimeout(() => { try { tg.expand(); } catch(e){} }, 1000);
+
+  // Реагируем на изменение viewport (Bot API 7.0+)
+  if (tg.onEvent) {
+    try {
+      tg.onEvent('viewportChanged', () => {
+        try { tg.expand(); } catch(e){}
+        window.dispatchEvent(new Event('resize'));
+      });
+    } catch(e){}
+  }
+
   setTimeout(() => window.dispatchEvent(new Event('resize')), 120);
-  setTimeout(() => { try { tg.expand(); } catch(e){} }, 500);
-  setTimeout(() => { try { tg.expand(); } catch(e){} }, 1500);
 }
 function haptic(t='light'){
   if (!tg?.HapticFeedback) return;
@@ -3187,14 +3994,40 @@ function playGulp(){
   const a = ensureAudio(); if (!a) return;
   try{
     const t = a.currentTime;
-    const o = a.createOscillator(), g = a.createGain();
-    o.type='sine';
-    o.frequency.setValueAtTime(210, t);
-    o.frequency.exponentialRampToValueAtTime(72, t + 0.11);
-    g.gain.setValueAtTime(0.16, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    o.connect(g).connect(a.destination);
-    o.start(t); o.stop(t + 0.13);
+
+    // 2 коротких «булька» — как настоящий глоток
+    for (let i = 0; i < 2; i++){
+      const start = t + i * 0.10;
+
+      // Основной тон — низкий бульк
+      const o = a.createOscillator(), g = a.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(i === 0 ? 170 : 140, start);
+      o.frequency.exponentialRampToValueAtTime(62, start + 0.085);
+      g.gain.setValueAtTime(0, start);
+      g.gain.linearRampToValueAtTime(0.18, start + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.001, start + 0.09);
+      o.connect(g).connect(a.destination);
+      o.start(start);
+      o.stop(start + 0.1);
+
+      // Шумовая «влажная» часть
+      const buf = a.createBuffer(1, Math.floor(a.sampleRate * 0.05), a.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let j = 0; j < data.length; j++){
+        data[j] = (Math.random() * 2 - 1) * Math.pow(1 - j/data.length, 3);
+      }
+      const noise = a.createBufferSource();
+      noise.buffer = buf;
+      const ng = a.createGain();
+      ng.gain.setValueAtTime(0.06, start);
+      ng.gain.exponentialRampToValueAtTime(0.001, start + 0.05);
+      const nf = a.createBiquadFilter();
+      nf.type = 'lowpass'; nf.frequency.value = 900;
+      noise.connect(nf).connect(ng).connect(a.destination);
+      noise.start(start);
+      noise.stop(start + 0.06);
+    }
   }catch(e){}
 }
 
@@ -3332,6 +4165,11 @@ function showApp(){
   preloadCharPhotos(getChar(STATE.charId));
   updatePrestigeTheme();
   setTimeout(()=>{ resize(); updateSliderPosition(); }, 60);
+
+  // Ежедневный ключ — только после входа в игру
+  setTimeout(() => {
+    try { if (typeof checkDailyKeysOnStart === 'function') checkDailyKeysOnStart(); } catch(e){}
+  }, 2500);
 }
 
 window.goToSelect = () => {
@@ -3636,17 +4474,7 @@ function draw(){
     ctx.fillRect(0, 0, w, h);
   }
 
-  // Декор локации
-  ctx.font = `${Math.floor(Math.min(w,h)*0.14)}px serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.globalAlpha = 0.22;
-  if (loc.decor?.[0]){
-    ctx.fillText(loc.decor[0], w*0.14 + parallaxX * 0.8, h*0.30 + parallaxY * 0.8);
-  }
-  if (loc.decor?.[1]){
-    ctx.fillText(loc.decor[1], w*0.86 + parallaxX * 0.6, h*0.72 + parallaxY * 0.6);
-  }
+
   ctx.globalAlpha = 1;
 
   // Свечение
@@ -3808,6 +4636,7 @@ function spawnParticles(x, y, color, count = 8){
 
 /* ПАДАЮЩИЕ СЛОВА */
 let lastWordAt = 0;
+let lastGulpAt = 0;
 function spawnFallingWord(){
   const now = performance.now();
   if (now - lastWordAt < 700) return;
@@ -3935,9 +4764,10 @@ function tick(dt){
     STATE.chug = Math.min(100, STATE.chug + dt * 0.12 * chugMult);
 
     if (STATE.chug > 95){
-      STATE.choke = 1500;
+      STATE.choke = 2800;
       haptic('error');
       playChoke();
+      triggerChokeEffect();
     } else {
       const sweet = STATE.chug >= 40 && STATE.chug <= 75;
       const b = BEERS[STATE.curBeer];
@@ -3960,7 +4790,12 @@ function tick(dt){
       STATE.totalCoins += coinAdd;
       if (STATE.liters > STATE.best) STATE.best = STATE.liters;
 
-      if (Math.random() < 0.22){ playGulp(); haptic('light'); }
+      const nowGulp = performance.now();
+      if (nowGulp - lastGulpAt > 340){
+        lastGulpAt = nowGulp;
+        playGulp();
+        haptic('light');
+      }
     }
   } else {
     STATE.chug = Math.max(0, STATE.chug - dt * 0.1);
@@ -3975,7 +4810,38 @@ function tick(dt){
     if (STATE.liters > STATE.best) STATE.best = STATE.liters;
   }
 }
+/* ==== Эффект поперхнулся ==== */
+let chokeEffectTimer = null;
+function triggerChokeEffect(){
+  const stage = document.getElementById('stage');
+  const overlay = document.getElementById('choke-overlay');
+  if (!stage || !overlay) return;
 
+  // Сброс предыдущего
+  if (chokeEffectTimer){ clearTimeout(chokeEffectTimer); chokeEffectTimer = null; }
+  stage.classList.remove('choking');
+  overlay.classList.remove('on');
+
+  // Запуск
+  void stage.offsetWidth;
+  stage.classList.add('choking');
+  overlay.classList.add('on');
+
+  // Частицы на экране
+  try {
+    const r = stage.getBoundingClientRect();
+    spawnParticles(r.left + r.width/2, r.top + r.height*0.42, '#d9534f', 10);
+  } catch(_){}
+
+  // Стоп-лок: пока поперхнулся — не пьётся
+  STATE.pressing = false;
+
+  chokeEffectTimer = setTimeout(() => {
+    stage.classList.remove('choking');
+    overlay.classList.remove('on');
+    chokeEffectTimer = null;
+  }, 2600);
+}
 function startMarathon(){
   STATE.marathonEndAt = Date.now() + MARATHON_DURATION;
   haptic('success');
@@ -4016,7 +4882,7 @@ function updateHUD(){
   }
 
   needleEl.style.left = STATE.chug + '%';
-  trackFill.style.width = STATE.chug + '%';
+  trackFill.style.transform = 'scaleX(' + (STATE.chug / 100) + ')';
 
   let color;
   if (STATE.choke > 0) color = '#d9534f';
@@ -4049,25 +4915,36 @@ function updateHUD(){
 }
 
 requestAnimationFrame(loop);
-
-/* Ввод */
+/* Ввод — универсальный: pointer + touch + mouse */
 const stageInput = document.getElementById('stage');
+
 if (stageInput){
-  stageInput.addEventListener('pointerdown', e => {
+  const onDown = (e) => {
     if (typeof battleState !== 'undefined' && battleState.active) return;
-    e.preventDefault();
-    ensureAudio();
+    try { ensureAudio(); } catch(_){}
     STATE.pressing = true;
     try { tg?.expand?.(); } catch(_){}
-  }, { passive: false });
+  };
+
+  stageInput.addEventListener('pointerdown', onDown, { passive: true });
+  stageInput.addEventListener('touchstart',  onDown, { passive: true });
+  stageInput.addEventListener('mousedown',   onDown, { passive: true });
 }
+
 const endPress = () => { STATE.pressing = false; };
-if (stageInput) {
-  stageInput.addEventListener('pointerleave', endPress);
+
+if (stageInput){
+  stageInput.addEventListener('pointerleave',  endPress);
   stageInput.addEventListener('pointercancel', endPress);
+  stageInput.addEventListener('touchcancel',   endPress);
+  stageInput.addEventListener('touchend',      endPress);
+  stageInput.addEventListener('mouseleave',    endPress);
+  stageInput.addEventListener('mouseup',       endPress);
 }
 window.addEventListener('pointerup', endPress);
-window.addEventListener('blur', endPress);
+window.addEventListener('touchend',  endPress);
+window.addEventListener('mouseup',   endPress);
+window.addEventListener('blur',      endPress);
 
 /* =========================================================
    ЧАСТЬ 10 — NAV + SHOP + BUFFS
@@ -5078,15 +5955,30 @@ setInterval(() => {
 
 setTimeout(updateOnlineCounter, 3000);
 
-/* ЗАЩИТА ОТ DOUBLE-TAP ZOOM */
+/* ЗАЩИТА ОТ DOUBLE-TAP ZOOM + ЛУПЫ */
 let lastTouchEnd = 0;
 document.addEventListener('touchend', (e) => {
   const now = Date.now();
-  if (now - lastTouchEnd <= 300){
-    e.preventDefault();
+  if (now - lastTouchEnd <= 400){
+    if (e.cancelable) e.preventDefault();
   }
   lastTouchEnd = now;
 }, { passive: false });
+
+// Отключаем dblclick-зум и pinch-зум
+document.addEventListener('dblclick', (e) => e.preventDefault(), { passive: false });
+
+// Отключаем pinch-to-zoom (2 пальца)
+document.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 1) {
+    if (e.cancelable) e.preventDefault();
+  }
+}, { passive: false });
+
+// Отключаем gesture-события Safari
+['gesturestart','gesturechange','gestureend'].forEach(ev => {
+  document.addEventListener(ev, (e) => e.preventDefault(), { passive: false });
+});
 
 /* INIT */
 (function init(){
@@ -5099,9 +5991,6 @@ document.addEventListener('touchend', (e) => {
     try { refreshTopbar(); } catch(e){}
   }
 
-  setTimeout(() => {
-    try { checkDailyKeysOnStart(); } catch(e){}
-  }, 2000);
 
   console.log(
     '%c🍺 Пивной Барон готов!',
@@ -5371,7 +6260,7 @@ const ACH_REWARD_SKINS = [
   { id:'cup_gold',     achId:'tank',      name:'Золотая кружка',    icon:'🥇', color:'#f7c948', desc:'За выпитые 1000 литров' },
   { id:'cup_diamond',  achId:'tycoon',    name:'Алмазный трон',     icon:'💎', color:'#4a9eff', desc:'За 100 000 ₽' },
   { id:'cup_combo',    achId:'combo',     name:'Кубок Потока',      icon:'🔥', color:'#ff8a1a', desc:'За комбо ×5' },
-  { id:'cup_prestige', achId:'prestige1', name:'Кубок Барона',      icon:'⭐', color:'#a566ff', desc:'За первый престиж' },
+  { id:'cup_prestige', achId:'prestige1', name:'Кубок Барона',      icon:'⭐', color:'#a566ff', desc:'За первый престиж' }, { id:'cup_boss',     achId:'boss_killer', name:'Кубок Босса',      icon:'👹', color:'#d94343', desc:'За убийство Босса дня' },
 ];
 
 function isAchSkinUnlocked(skinId){
@@ -6151,7 +7040,7 @@ console.log(
   'background:linear-gradient(135deg,#7cb342,#f7c948);color:#1a1005;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:12px'
 );
 /* =========================================================
-   ЧАСТЬ 4 — БИТВА С БОТАМИ
+   ЧАСТЬ 4 — БИТВА С БОТАМИ (ловля кружек)
    ========================================================= */
 
 const BATTLE_STAKES = [100, 500, 1000, 5000, 25000, 100000];
@@ -6169,13 +7058,11 @@ const battleState = {
   stake: 100,
   bot: null,
   timeLeft: 30,
-  playerLiters: 0,
-  botLiters: 0,
-  pressing: false,
-  chug: 0,
-  choke: 0,
-  lastTs: 0,
-  rafId: null,
+  playerScore: 0,
+  botScore: 0,
+  tickTimer: null,
+  mugTimer: null,
+  botTimer: null,
 };
 
 window.openBattle = () => {
@@ -6195,7 +7082,7 @@ window.openBattle = () => {
   modal.innerHTML = `
     <div class="battle-header">
       <div class="battle-title">⚔️ Битва Баронов</div>
-      <div class="battle-sub">30 секунд · кто больше выпьет — забирает банк</div>
+      <div class="battle-sub">Лови кружки 30 секунд · кто больше поймал — забирает банк</div>
     </div>
     <div style="padding:20px">
       <div style="text-align:center;font-family:'Unbounded',sans-serif;font-size:11px;color:#8a7f6b;letter-spacing:1.2px;margin-bottom:14px;font-weight:700">ВЫБЕРИ СТАВКУ</div>
@@ -6242,7 +7129,7 @@ function startBattleSearch(){
 
     battleState.bot = { ...pool[Math.floor(Math.random() * pool.length)] };
     startBattle();
-  }, 2000 + Math.random() * 1500);
+  }, 1500 + Math.random() * 1000);
 }
 
 function startBattle(){
@@ -6251,157 +7138,111 @@ function startBattle(){
 
   battleState.active = true;
   battleState.timeLeft = BATTLE_DURATION;
-  battleState.playerLiters = 0;
-  battleState.botLiters = 0;
-  battleState.pressing = false;
-  battleState.chug = 0;
-  battleState.choke = 0;
-  battleState.lastTs = performance.now();
+  battleState.playerScore = 0;
+  battleState.botScore = 0;
 
   const bot = battleState.bot;
   const modal = document.getElementById('battle-modal');
 
   modal.innerHTML = `
     <div class="battle-header">
-      <div class="battle-title">⚔️ БОЙ ИДЁТ</div>
+      <div class="battle-title">⚔️ ЛОВИ КРУЖКИ!</div>
       <div class="battle-sub">Ставка: ${battleState.stake.toLocaleString('ru-RU')} ₽</div>
     </div>
-    <div class="battle-stage">
+    <div class="battle-stage" style="padding:12px 16px 16px">
       <div class="battle-timer" id="battle-timer">${BATTLE_DURATION}</div>
 
-      <div class="battle-side">
-        <div class="battle-side-head">
-          <span class="battle-name">😎 Ты</span>
-          <span class="battle-liters" id="battle-player-liters">0.0 л</span>
+      <div class="battle-score-row-top">
+        <div class="battle-score-chip">
+          <span class="name">😎 Ты</span>
+          <span class="score" id="battle-player-score">0</span>
         </div>
-        <div class="battle-bar"><div class="battle-bar-fill player" id="battle-player-bar" style="width:0%"></div></div>
+        <div class="battle-score-chip bot">
+          <span class="name">${bot.emoji} ${bot.name}</span>
+          <span class="score" id="battle-bot-score">0</span>
+        </div>
       </div>
 
-      <div class="battle-vs">VS</div>
-
-      <div class="battle-side">
-        <div class="battle-side-head">
-          <span class="battle-name">${bot.emoji} ${bot.name}
-            <span style="color:${bot.color};font-size:10px;font-weight:700;letter-spacing:.5px">${bot.level}</span>
-          </span>
-          <span class="battle-liters" id="battle-bot-liters">0.0 л</span>
-        </div>
-        <div class="battle-bar"><div class="battle-bar-fill bot" id="battle-bot-bar" style="width:0%"></div></div>
-      </div>
-
-      <button class="battle-tap-btn" id="battle-tap-btn" style="margin-top:14px">ДЕРЖИ ЧТОБЫ ПИТЬ</button>
+      <div class="battle-arena" id="battle-arena"></div>
     </div>
   `;
 
-  const btn = document.getElementById('battle-tap-btn');
-  const startPress = (e) => {
+  battleState.tickTimer = setInterval(() => {
+    if (!battleState.active) return;
+    battleState.timeLeft--;
+    const tEl = document.getElementById('battle-timer');
+    if (tEl) tEl.innerText = Math.max(0, battleState.timeLeft);
+    if (battleState.timeLeft <= 0){
+      finishBattle();
+    }
+  }, 1000);
+
+  battleState.mugTimer = setInterval(() => {
+    if (!battleState.active) return;
+    spawnBattleMug();
+  }, 480);
+
+  battleState.botTimer = setInterval(() => {
+    if (!battleState.active) return;
+    if (Math.random() < bot.lps * 0.9) {
+      battleState.botScore++;
+      const bs = document.getElementById('battle-bot-score');
+      if (bs) bs.innerText = battleState.botScore;
+    }
+  }, 500);
+
+  setTimeout(spawnBattleMug, 120);
+}
+
+function spawnBattleMug(){
+  const arena = document.getElementById('battle-arena');
+  if (!arena) return;
+  if (arena.childElementCount > 12) return;
+
+  const mug = document.createElement('div');
+  mug.className = 'battle-mug';
+  mug.innerText = '🍺';
+  mug.style.left = (5 + Math.random() * 82) + '%';
+  const duration = 2.2 + Math.random() * 1.0;
+  mug.style.animationDuration = duration + 's';
+
+  const onCatch = (e) => {
     e.preventDefault();
-    if (battleState.choke > 0) return;
-    battleState.pressing = true;
-    btn.classList.add('pressing');
-    ensureAudio();
+    e.stopPropagation();
+    if (!battleState.active) return;
+    battleState.playerScore++;
+    const ps = document.getElementById('battle-player-score');
+    if (ps) ps.innerText = battleState.playerScore;
+    haptic('light');
+    try { playGulp(); } catch(_){}
+    mug.classList.add('caught');
+    setTimeout(() => mug.remove(), 320);
   };
-  const endPress = () => {
-    battleState.pressing = false;
-    if (btn) btn.classList.remove('pressing');
-  };
-  btn.addEventListener('pointerdown', startPress, { passive: false });
-  btn.addEventListener('pointerup', endPress);
-  btn.addEventListener('pointerleave', endPress);
-  btn.addEventListener('pointercancel', endPress);
 
-  battleState.lastTs = performance.now();
-  battleState.rafId = requestAnimationFrame(battleLoop);
-}
+  mug.addEventListener('pointerdown', onCatch, { passive: false });
+  mug.addEventListener('animationend', () => mug.remove());
 
-function battleLoop(now){
-  if (!battleState.active) return;
-
-  const dt = Math.min(0.064, (now - battleState.lastTs) / 1000);
-  battleState.lastTs = now;
-
-  battleState.timeLeft -= dt;
-  if (battleState.timeLeft <= 0){
-    battleState.timeLeft = 0;
-    updateBattleUI();
-    finishBattle();
-    return;
-  }
-
-  if (battleState.choke > 0){
-    battleState.choke -= dt * 1000;
-  } else if (battleState.pressing){
-    battleState.chug = Math.min(100, battleState.chug + dt * 100 * 0.12);
-    if (battleState.chug > 95){
-      battleState.choke = 1500;
-      battleState.chug = 0;
-      battleState.pressing = false;
-      haptic('error');
-      playChoke();
-      const btn = document.getElementById('battle-tap-btn');
-      if (btn) btn.classList.remove('pressing');
-    } else {
-      const sweet = battleState.chug >= 40 && battleState.chug <= 75;
-      const rate = sweet ? 0.75 : 0.20;
-      battleState.playerLiters += rate * dt;
-    }
-  } else {
-    battleState.chug = Math.max(0, battleState.chug - dt * 100 * 0.1);
-  }
-
-  if (battleState.bot){
-    const variance = 0.85 + Math.random() * 0.3;
-    battleState.botLiters += battleState.bot.lps * variance * dt;
-  }
-
-  updateBattleUI();
-  battleState.rafId = requestAnimationFrame(battleLoop);
-}
-
-function updateBattleUI(){
-  const timerEl = document.getElementById('battle-timer');
-  const playerLitEl = document.getElementById('battle-player-liters');
-  const botLitEl = document.getElementById('battle-bot-liters');
-  const playerBarEl = document.getElementById('battle-player-bar');
-  const botBarEl = document.getElementById('battle-bot-bar');
-  const btn = document.getElementById('battle-tap-btn');
-
-  if (timerEl) timerEl.innerText = Math.ceil(battleState.timeLeft);
-  if (playerLitEl) playerLitEl.innerText = battleState.playerLiters.toFixed(1) + ' л';
-  if (botLitEl) botLitEl.innerText = battleState.botLiters.toFixed(1) + ' л';
-
-  const maxLit = Math.max(battleState.playerLiters, battleState.botLiters, 20);
-  if (playerBarEl) playerBarEl.style.width = Math.min(100, (battleState.playerLiters / maxLit) * 100) + '%';
-  if (botBarEl) botBarEl.style.width = Math.min(100, (battleState.botLiters / maxLit) * 100) + '%';
-
-  if (btn){
-    if (battleState.choke > 0){
-      btn.innerText = 'ПОПЕРХНУЛСЯ...';
-      btn.style.opacity = '0.5';
-    } else if (battleState.pressing){
-      btn.innerText = 'ПЬЁШЬ...';
-      btn.style.opacity = '1';
-    } else {
-      btn.innerText = 'ДЕРЖИ ЧТОБЫ ПИТЬ';
-      btn.style.opacity = '1';
-    }
-  }
+  arena.appendChild(mug);
 }
 
 function finishBattle(){
+  if (!battleState.active) return;
   battleState.active = false;
-  if (battleState.rafId){
-    cancelAnimationFrame(battleState.rafId);
-    battleState.rafId = null;
-  }
 
-  const pL = battleState.playerLiters;
-  const bL = battleState.botLiters;
+  if (battleState.tickTimer) { clearInterval(battleState.tickTimer); battleState.tickTimer = null; }
+  if (battleState.mugTimer)  { clearInterval(battleState.mugTimer);  battleState.mugTimer = null; }
+  if (battleState.botTimer)  { clearInterval(battleState.botTimer);  battleState.botTimer = null; }
+
+  const arena = document.getElementById('battle-arena');
+  if (arena) arena.querySelectorAll('.battle-mug').forEach(el => el.remove());
+
+  const pS = battleState.playerScore;
+  const bS = battleState.botScore;
   const stake = battleState.stake;
 
   let icon, title, rewardText, titleClass;
 
-  if (pL > bL){
+  if (pS > bS){
     icon = '🏆';
     title = 'Победа!';
     rewardText = '+' + stake.toLocaleString('ru-RU') + ' ₽';
@@ -6409,15 +7250,13 @@ function finishBattle(){
     STATE.coins += stake;
     STATE.totalCoins += stake;
     STATE.battlesWon = (STATE.battlesWon || 0) + 1;
-
     if (typeof STATE.keys === 'number'){
       STATE.keys += 1;
       if (typeof saveImp === 'function') saveImp();
     }
-
     haptic('success');
     playReward();
-  } else if (pL < bL){
+  } else if (pS < bS){
     icon = '💀';
     title = 'Поражение';
     rewardText = '−' + stake.toLocaleString('ru-RU') + ' ₽';
@@ -6447,11 +7286,11 @@ function finishBattle(){
       <div class="battle-score-box">
         <div class="battle-score-row">
           <span style="color:#8a7f6b">😎 Ты</span>
-          <span style="color:#7cb342;font-family:'Unbounded',sans-serif;font-weight:700">${pL.toFixed(1)} л</span>
+          <span style="color:#7cb342;font-family:'Unbounded',sans-serif;font-weight:700">${pS} 🍺</span>
         </div>
         <div class="battle-score-row">
           <span style="color:#8a7f6b">${battleState.bot.emoji} ${battleState.bot.name}</span>
-          <span style="color:#d94343;font-family:'Unbounded',sans-serif;font-weight:700">${bL.toFixed(1)} л</span>
+          <span style="color:#d94343;font-family:'Unbounded',sans-serif;font-weight:700">${bS} 🍺</span>
         </div>
       </div>
       <div style="font-family:'Manrope',sans-serif;font-size:11px;color:#8a7f6b;font-weight:600">
@@ -6467,10 +7306,9 @@ function finishBattle(){
 
 window.closeBattle = () => {
   battleState.active = false;
-  if (battleState.rafId){
-    cancelAnimationFrame(battleState.rafId);
-    battleState.rafId = null;
-  }
+  if (battleState.tickTimer) { clearInterval(battleState.tickTimer); battleState.tickTimer = null; }
+  if (battleState.mugTimer)  { clearInterval(battleState.mugTimer);  battleState.mugTimer = null; }
+  if (battleState.botTimer)  { clearInterval(battleState.botTimer);  battleState.botTimer = null; }
   document.getElementById('battle-modal-bg').classList.remove('on');
   renderProfile();
   save();
@@ -6565,123 +7403,7 @@ function loadImp(){
 }
 loadImp();
 
-/* ===== КАРТА: вид + жесты ===== */
-const imperiaView = {
-  scale: 0.6,
-  x: 0,
-  y: 0,
-  minScale: 0.4,
-  maxScale: 2.5,
-  init: false,
-};
 
-function imperiaUpdateTransform(){
-  const canvas = document.getElementById('imperia-canvas');
-  if (!canvas) return;
-  canvas.style.transform = `translate(${imperiaView.x}px, ${imperiaView.y}px) scale(${imperiaView.scale})`;
-}
-
-window.imperiaReset = function(){
-  const vp = document.getElementById('imperia-viewport');
-  if (!vp) return;
-  const vpRect = vp.getBoundingClientRect();
-  imperiaView.scale = 0.6;
-  imperiaView.x = vpRect.width / 2 - 1000 * imperiaView.scale;
-  imperiaView.y = vpRect.height / 2 - 1000 * imperiaView.scale;
-  imperiaUpdateTransform();
-  haptic('light');
-};
-
-window.imperiaZoom = function(delta){
-  const vp = document.getElementById('imperia-viewport');
-  if (!vp) return;
-  const vpRect = vp.getBoundingClientRect();
-  const cx = vpRect.width / 2;
-  const cy = vpRect.height / 2;
-
-  const oldScale = imperiaView.scale;
-  const newScale = Math.max(imperiaView.minScale, Math.min(imperiaView.maxScale, oldScale + delta));
-
-  imperiaView.x = cx - (cx - imperiaView.x) * (newScale / oldScale);
-  imperiaView.y = cy - (cy - imperiaView.y) * (newScale / oldScale);
-  imperiaView.scale = newScale;
-
-  imperiaUpdateTransform();
-  haptic('light');
-};
-
-let imperiaPointers = new Map();
-let imperiaStartDist = 0;
-let imperiaStartScale = 0;
-let imperiaStartMid = { x: 0, y: 0 };
-let imperiaStartPan = { x: 0, y: 0 };
-
-function imperiaSetupGestures(){
-  const vp = document.getElementById('imperia-viewport');
-  if (!vp || vp._gesturesReady) return;
-  vp._gesturesReady = true;
-
-  vp.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('.imperia-building') || e.target.closest('.imperia-ctrl-btn')) return;
-    try { vp.setPointerCapture(e.pointerId); } catch(err){}
-    imperiaPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    vp.classList.add('dragging');
-
-    if (imperiaPointers.size === 1){
-      imperiaStartPan = { x: e.clientX - imperiaView.x, y: e.clientY - imperiaView.y };
-    } else if (imperiaPointers.size === 2){
-      const pts = Array.from(imperiaPointers.values());
-      imperiaStartDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      imperiaStartScale = imperiaView.scale;
-      imperiaStartMid = {
-        x: (pts[0].x + pts[1].x) / 2,
-        y: (pts[0].y + pts[1].y) / 2,
-      };
-      imperiaStartPan = { x: imperiaView.x, y: imperiaView.y };
-    }
-  });
-
-  vp.addEventListener('pointermove', (e) => {
-    if (!imperiaPointers.has(e.pointerId)) return;
-    imperiaPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-    if (imperiaPointers.size === 1){
-      imperiaView.x = e.clientX - imperiaStartPan.x;
-      imperiaView.y = e.clientY - imperiaStartPan.y;
-      imperiaUpdateTransform();
-    } else if (imperiaPointers.size === 2){
-      const pts = Array.from(imperiaPointers.values());
-      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
-      const mid = {
-        x: (pts[0].x + pts[1].x) / 2,
-        y: (pts[0].y + pts[1].y) / 2,
-      };
-      const ratio = dist / imperiaStartDist;
-      const newScale = Math.max(imperiaView.minScale, Math.min(imperiaView.maxScale, imperiaStartScale * ratio));
-
-      const oldScale = imperiaView.scale;
-      const k = newScale / oldScale;
-      imperiaView.x = mid.x - (imperiaStartMid.x - imperiaStartPan.x) * k - (imperiaStartMid.x - mid.x);
-      imperiaView.y = mid.y - (imperiaStartMid.y - imperiaStartPan.y) * k - (imperiaStartMid.y - mid.y);
-      imperiaView.x += (mid.x - imperiaStartMid.x);
-      imperiaView.y += (mid.y - imperiaStartMid.y);
-      imperiaView.scale = newScale;
-      imperiaUpdateTransform();
-    }
-  });
-
-  const endPointer = (e) => {
-    imperiaPointers.delete(e.pointerId);
-    if (imperiaPointers.size === 0){
-      vp.classList.remove('dragging');
-    }
-  };
-  vp.addEventListener('pointerup', endPointer);
-  vp.addEventListener('pointercancel', endPointer);
-  vp.addEventListener('pointerleave', endPointer);
-}
-
-setTimeout(imperiaSetupGestures, 500);
 
 /* ===== РЕНДЕР КАРТЫ ===== */
 function renderImperiaMap(){
@@ -6696,8 +7418,8 @@ function renderImperiaMap(){
 
     const el = document.createElement('div');
     el.className = 'imperia-building ' + (owned ? 'owned' : 'locked');
-    el.style.left = (b.x * 20) + 'px';
-    el.style.top = (b.y * 20) + 'px';
+    el.style.left = b.x + '%';
+    el.style.top = b.y + '%';
     el.onclick = (e) => {
       e.stopPropagation();
       openBuildingModal(b.id);
@@ -6717,6 +7439,14 @@ function renderImperiaMap(){
 
   const bonusEl = document.getElementById('imperia-bonus');
   if (bonusEl) bonusEl.innerText = '+' + getImperiaBonus() + '% к доходу';
+
+  // Счётчик застроенных зданий
+  const infoCountEl = document.getElementById('imperia-info-count');
+  if (infoCountEl){
+    const built = Object.keys(STATE.imperia || {}).length;
+    const total = IMPERIA_BUILDINGS.length;
+    infoCountEl.innerText = 'Построено ' + built + ' / ' + total;
+  }
 }
 
 /* ===== МОДАЛКА ЗДАНИЯ ===== */
@@ -6879,21 +7609,8 @@ function renderImperia(){
 
   renderImperiaMap();
 
-  if (!imperiaView.init){
-    imperiaView.init = true;
-    setTimeout(() => { try { imperiaReset(); } catch(e){} }, 100);
-  }
-
   const keysEl = document.getElementById('imperia-keys-count');
   if (keysEl) keysEl.innerText = STATE.keys;
-
-  const hint = document.getElementById('imperia-hint');
-  if (hint && !hint._seen){
-    hint._seen = true;
-    setTimeout(() => hint.classList.add('hide'), 4000);
-  }
-
-  try { imperiaSetupGestures(); } catch(e){}
 }
 
 /* ===== ЕЖЕДНЕВНЫЙ КЛЮЧ ===== */
@@ -6916,6 +7633,559 @@ console.log(
   '%c⚔️🏙 Пачка 4-6 загружена: битва + империя + прокачка',
   'background:linear-gradient(135deg,#d94343,#f5a623);color:#fff;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:12px'
 );
+/* =========================================================
+   ЧАСТЬ 7 — БОСС ДНЯ
+   ========================================================= */
+
+const BOSS_SAVE_KEY = 'beer_baron_boss_v1';
+
+const BOSSES = [
+  { id:'magnat',  name:'Пивной Магнат',  emoji:'🎩', color:'#f7c948',
+    desc:'Скупил все бары города. Пора показать, кто тут настоящий барон.' },
+  { id:'tax',     name:'Налоговая',      emoji:'📋', color:'#4a9eff',
+    desc:'Пришла с проверкой. Достанет тебя до копейки, если не отобьёшься.' },
+  { id:'network', name:'Конкурент-сеть', emoji:'🏢', color:'#a566ff',
+    desc:'Франшиза открыла бар напротив. Переманивает клиентов.' },
+  { id:'giant',   name:'Мировой Гигант', emoji:'🌍', color:'#7cb342',
+    desc:'Транснациональная корпорация хочет поглотить твой бизнес.' },
+  { id:'shadow',  name:'Тень Прошлого',  emoji:'👤', color:'#7a6a50',
+    desc:'Старый конкурент, которого ты давно забыл. Он вернулся.' },
+  { id:'dragon',  name:'Пивной Дракон',  emoji:'🐉', color:'#ff8a1a',
+    desc:'Легенда подпольного рынка. Никто не видел его и остался в деле.' },
+];
+
+Object.assign(STATE, {
+  boss: {
+    day: 0,
+    bossId: null,
+    maxHp: 0,
+    hp: 0,
+    defeated: false,
+    totalDefeated: 0,
+    debuffUntil: 0,
+  },
+});
+
+function loadBoss(){
+  try{
+    const raw = localStorage.getItem(BOSS_SAVE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d && typeof d === 'object'){
+      STATE.boss.day = d.day || 0;
+      STATE.boss.bossId = d.bossId || null;
+      STATE.boss.maxHp = d.maxHp || 0;
+      STATE.boss.hp = d.hp || 0;
+      STATE.boss.defeated = !!d.defeated;
+      STATE.boss.totalDefeated = d.totalDefeated || 0;
+      STATE.boss.debuffUntil = d.debuffUntil || 0;
+    }
+  }catch(e){}
+}
+
+function saveBoss(){
+  try{
+    localStorage.setItem(BOSS_SAVE_KEY, JSON.stringify(STATE.boss));
+  }catch(e){}
+}
+
+loadBoss();
+
+function getBossById(id){
+  return BOSSES.find(b => b.id === id) || BOSSES[0];
+}
+
+function computeBossMaxHp(){
+  const clickEstimate = 0.5;
+  const pMult = getPrestigeMult();
+  const locMult = getCurrentLocation().mult;
+  const impMult = (typeof getImperiaMult === 'function') ? getImperiaMult() : 1;
+  const baseIncome = Math.max(0.1, (STATE.autoLps || 0) + clickEstimate);
+  const income = baseIncome * pMult * locMult * impMult;
+  return Math.max(5000, Math.floor(income * 5000));
+}
+
+function ensureBossToday(){
+  const today = getTodayKey();
+  if (STATE.boss.day === today && STATE.boss.bossId && STATE.boss.maxHp > 0) return;
+
+  const randomBoss = BOSSES[Math.floor(Math.random() * BOSSES.length)];
+  const hp = computeBossMaxHp();
+
+  STATE.boss.day = today;
+  STATE.boss.bossId = randomBoss.id;
+  STATE.boss.maxHp = hp;
+  STATE.boss.hp = hp;
+  STATE.boss.defeated = false;
+  STATE.boss.debuffUntil = 0;
+  lastBossPhase = 1;
+
+  saveBoss();
+
+  setTimeout(() => {
+    const appHidden = document.getElementById('app').classList.contains('hidden');
+    if (!appHidden){
+      showToast('👹 Новый босс дня', randomBoss.name + ' — иди разбирайся');
+    }
+  }, 1200);
+}
+
+function damageBoss(liters){
+  if (STATE.boss.defeated) return;
+  if (!STATE.boss.bossId) return;
+  const dmg = liters * 100;
+  STATE.boss.hp = Math.max(0, STATE.boss.hp - dmg);
+  if (STATE.boss.hp <= 0){
+    onBossDefeated();
+  }
+}
+
+function onBossDefeated(){
+  if (STATE.boss.defeated) return;
+  STATE.boss.defeated = true;
+  STATE.boss.totalDefeated = (STATE.boss.totalDefeated || 0) + 1;
+
+  STATE.keys = (STATE.keys || 0) + 500;
+  if (typeof saveImp === 'function') saveImp();
+
+  if (!STATE.achievements.includes('boss_killer')){
+    STATE.achievements.push('boss_killer');
+  }
+
+  save();
+  saveBoss();
+
+  haptic('success');
+  playReward();
+
+  showToast('🏆 БОСС ПОВЕРЖЕН!', '+500 🔑 · Ачивка открыта');
+
+  setTimeout(() => {
+    showModal({
+      icon: '👹',
+      title: 'Босс повержен!',
+      text: `<b>${getBossById(STATE.boss.bossId).name}</b> падает к твоим ногам.<br><br>
+        💰 Награда: <b>+500 🔑</b><br>
+        🏆 Достижение: <b>Убийца Боссов</b><br>
+        🥇 Кубок открыт в профиле`,
+      confirmText: 'Забрать',
+      noCancel: true,
+    });
+  }, 800);
+}
+
+function bossPhase(hp, maxHp){
+  const pct = maxHp > 0 ? hp / maxHp : 0;
+  if (pct > 0.66) return 1;
+  if (pct > 0.33) return 2;
+  return 3;
+}
+
+let lastBossPhase = 1;
+function checkBossPhase(){
+  if (STATE.boss.defeated) return;
+  const phase = bossPhase(STATE.boss.hp, STATE.boss.maxHp);
+  if (phase > lastBossPhase){
+    lastBossPhase = phase;
+    if (phase === 2){
+      haptic('warning');
+      showToast('👹 Босс злится!', 'Фаза 2');
+    } else if (phase === 3){
+      haptic('warning');
+      showToast('🔥 Босс в ярости!', 'Фаза 3 — решающий удар');
+    }
+  }
+}
+
+window.openBoss = () => {
+  haptic('light');
+  ensureBossToday();
+  renderBossModal();
+};
+
+function renderBossModal(){
+  const boss = getBossById(STATE.boss.bossId);
+  const hpPct = STATE.boss.maxHp > 0
+    ? Math.max(0, STATE.boss.hp / STATE.boss.maxHp)
+    : 0;
+  const hpPct100 = Math.round(hpPct * 100);
+  const phase = bossPhase(STATE.boss.hp, STATE.boss.maxHp);
+  const defeated = STATE.boss.defeated;
+
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setHours(24, 0, 0, 0);
+  const msLeft = tomorrow - now;
+  const hh = Math.floor(msLeft / 3600000);
+  const mm = Math.floor((msLeft % 3600000) / 60000);
+
+  const hpText = defeated
+    ? 'ПОВЕРЖЕН'
+    : `${Math.floor(STATE.boss.hp).toLocaleString('ru-RU')} / ${STATE.boss.maxHp.toLocaleString('ru-RU')}`;
+
+  let fillClass = '';
+  if (phase === 2) fillClass = 'phase2';
+  if (phase === 3) fillClass = 'phase3';
+
+  const modal = document.getElementById('boss-modal');
+  modal.innerHTML = `
+    <div class="boss-header">
+      <div class="boss-emoji">${defeated ? '💀' : boss.emoji}</div>
+      <div class="boss-name">${boss.name}</div>
+      <div class="boss-title">Босс дня · ${defeated ? 'ПОВЕРЖЕН' : 'Фаза ' + phase}</div>
+    </div>
+    <div class="boss-body">
+      <div class="boss-desc">${defeated ? 'Ты доказал, кто здесь настоящий барон. Возвращайся завтра.' : boss.desc}</div>
+
+      <div class="boss-hp-bar">
+        <div class="boss-hp-fill ${fillClass}" style="width:${defeated ? 0 : hpPct100}%"></div>
+        <div class="boss-hp-text">${hpText}</div>
+      </div>
+
+      <div class="boss-stats">
+        <span>💪 Урон: 100/л</span>
+        <span>${defeated ? '✅ Готово' : '⏳ ' + hh + 'ч ' + mm + 'м'}</span>
+      </div>
+
+      <div class="boss-actions">
+        ${defeated
+          ? `<button class="btn-boss-fight" disabled>ПОВЕРЖЕН</button>`
+          : `<button class="btn-boss-fight" onclick="onBossFight()">В БОЙ</button>`}
+        <button class="btn-boss-close" onclick="closeBoss()">Закрыть</button>
+      </div>
+
+      <div class="boss-reward">
+        🏆 Награда: <b>500 🔑</b> + <b>Кубок Босса</b>
+      </div>
+
+      ${STATE.boss.totalDefeated > 0
+        ? `<div class="boss-timer">Всего побед над боссами: ${STATE.boss.totalDefeated}</div>`
+        : ``}
+    </div>
+  `;
+
+  document.getElementById('boss-modal-bg').classList.add('on');
+  attachRippleAll();
+}
+window.onBossFight = () => {
+  closeBoss();
+  setTimeout(() => {
+    openBossArena();
+  }, 180);
+};
+window.closeBoss = () => {
+  document.getElementById('boss-modal-bg').classList.remove('on');
+};
+
+// Урон от литров — каждые 500мс проверяем прирост
+let lastBossLiters = STATE.liters;
+setInterval(() => {
+  if (STATE.boss.defeated){
+    lastBossLiters = STATE.liters;
+    return;
+  }
+  const diff = STATE.liters - lastBossLiters;
+  if (diff > 0){
+    lastBossLiters = STATE.liters;
+    damageBoss(diff);
+    checkBossPhase();
+  }
+}, 500);
+
+// Ежедневная проверка
+ensureBossToday();
+
+console.log(
+  '%c👹 Босс дня загружен',
+  'background:linear-gradient(135deg,#d94343,#a566ff);color:#fff;font-weight:bold;padding:3px 10px;border-radius:5px;font-size:12px'
+);
+/* =========================================================
+   ЧАСТЬ 8 — АРЕНА БОССА (броски кружек)
+   ========================================================= */
+
+const baState = {
+  open: false,
+  lastThrowAt: 0,
+  thrownCount: 0,
+  hitCount: 0,
+  critCount: 0,
+};
+
+function baGetDamagePerThrow(){
+  // ~100 бросков убивают босса
+  if (!STATE.boss || !STATE.boss.maxHp) return 500;
+  return Math.max(50, Math.floor(STATE.boss.maxHp / 100));
+}
+
+window.openBossArena = () => {
+  ensureBossToday();
+  haptic('medium');
+
+  if (STATE.boss.defeated){
+    // Уже побеждён — открываем обычную модалку со статусом
+    openBoss();
+    return;
+  }
+
+  baState.open = true;
+  baState.thrownCount = 0;
+  baState.hitCount = 0;
+  baState.critCount = 0;
+  baState.lastThrowAt = 0;
+
+  // Сброс UI
+  const vEl = document.getElementById('ba-victory');
+  if (vEl) vEl.classList.remove('on');
+  const stage = document.getElementById('ba-stage');
+  if (stage) stage.querySelectorAll('.ba-beer,.ba-dmg,.ba-miss,.ba-hit-flash').forEach(el => el.remove());
+
+  document.getElementById('ba-thrown').innerText = '0';
+  document.getElementById('ba-hits').innerText = '0';
+  document.getElementById('ba-crits').innerText = '0';
+
+  renderBossArena();
+
+  document.querySelectorAll('.setup').forEach(s => s.classList.remove('active'));
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('boss-arena').classList.add('active');
+
+  // Слушаем тапы по арене
+  bindBossArenaInput();
+
+  // Начинаем idle-анимацию босса
+  const bossEl = document.getElementById('ba-boss');
+  if (bossEl){
+    bossEl.classList.remove('hit','rage');
+    const phase = bossPhase(STATE.boss.hp, STATE.boss.maxHp);
+    if (phase === 3) bossEl.classList.add('rage');
+  }
+};
+
+window.closeBossArena = () => {
+  baState.open = false;
+  document.getElementById('boss-arena').classList.remove('active');
+  document.getElementById('app').classList.remove('hidden');
+  switchTab('game');
+  renderProfile();
+  save();
+};
+
+function renderBossArena(){
+  if (!STATE.boss || !STATE.boss.bossId) return;
+  const boss = getBossById(STATE.boss.bossId);
+
+  const nameEl = document.getElementById('ba-boss-name');
+  const phaseEl = document.getElementById('ba-boss-phase');
+  const bossEl = document.getElementById('ba-boss');
+  const fillEl = document.getElementById('ba-hp-fill');
+  const textEl = document.getElementById('ba-hp-text');
+
+  if (nameEl) nameEl.innerText = boss.name;
+  if (bossEl) bossEl.innerText = boss.emoji;
+
+  const hp = STATE.boss.hp;
+  const maxHp = STATE.boss.maxHp;
+  const pct = maxHp > 0 ? Math.max(0, hp / maxHp) : 0;
+  const phase = bossPhase(hp, maxHp);
+
+  if (phaseEl) phaseEl.innerText = 'Фаза ' + phase;
+  if (fillEl){
+    fillEl.style.width = (pct * 100) + '%';
+    fillEl.classList.toggle('phase2', phase === 2);
+    fillEl.classList.toggle('phase3', phase === 3);
+  }
+  if (textEl){
+    textEl.innerText = Math.floor(hp).toLocaleString('ru-RU') + ' / ' + maxHp.toLocaleString('ru-RU');
+  }
+  if (bossEl){
+    bossEl.classList.toggle('rage', phase === 3 && !STATE.boss.defeated);
+  }
+}
+
+let baInputBound = false;
+function bindBossArenaInput(){
+  if (baInputBound) return;
+  baInputBound = true;
+
+  const stage = document.getElementById('ba-stage');
+  if (!stage) return;
+
+  const onTap = (e) => {
+    if (!baState.open) return;
+    if (STATE.boss.defeated) return;
+    const now = performance.now();
+    if (now - baState.lastThrowAt < 110) return; // rate-limit
+    baState.lastThrowAt = now;
+
+    const rect = stage.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    throwBeerAt(x, y);
+  };
+
+  stage.addEventListener('pointerdown', onTap, { passive: true });
+  stage.addEventListener('touchstart',  onTap, { passive: true });
+}
+
+function throwBeerAt(x, y){
+  const stage = document.getElementById('ba-stage');
+  const bossEl = document.getElementById('ba-boss');
+  if (!stage || !bossEl) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  const bossRect = bossEl.getBoundingClientRect();
+
+  // Стартовая точка — низ арены по центру
+  const startX = stageRect.width / 2;
+  const startY = stageRect.height - 20;
+
+  const bossCx = bossRect.left - stageRect.left + bossRect.width / 2;
+  const bossCy = bossRect.top - stageRect.top + bossRect.height / 2;
+  const bossR = Math.max(bossRect.width, bossRect.height) * 0.4;
+
+  // Создаём кружку
+  const beer = document.createElement('div');
+  beer.className = 'ba-beer';
+  beer.innerText = '🍺';
+  beer.style.left = startX + 'px';
+  beer.style.top  = startY + 'px';
+  beer.style.setProperty('--tx', (x - startX).toFixed(1) + 'px');
+  beer.style.setProperty('--ty', (y - startY).toFixed(1) + 'px');
+  stage.appendChild(beer);
+
+  baState.thrownCount++;
+  const thrownEl = document.getElementById('ba-thrown');
+  if (thrownEl) thrownEl.innerText = baState.thrownCount;
+
+  // Проверка попадания
+  const dx = x - bossCx;
+  const dy = y - bossCy;
+  const dist = Math.hypot(dx, dy);
+  const hit = dist <= bossR;
+
+  setTimeout(() => {
+    beer.remove();
+    if (!baState.open) return;
+
+    if (hit){
+      onBeerHit(x, y);
+    } else {
+      onBeerMiss(x, y);
+    }
+  }, 420);
+}
+
+function onBeerHit(x, y){
+  baState.hitCount++;
+  const hitsEl = document.getElementById('ba-hits');
+  if (hitsEl) hitsEl.innerText = baState.hitCount;
+
+  // Крит? 12% шанс
+  const isCrit = Math.random() < 0.12;
+  if (isCrit){
+    baState.critCount++;
+    const crEl = document.getElementById('ba-crits');
+    if (crEl) crEl.innerText = baState.critCount;
+  }
+
+  const stage = document.getElementById('ba-stage');
+  const bossEl = document.getElementById('ba-boss');
+
+  // Вспышка
+  if (stage){
+    const flash = document.createElement('div');
+    flash.className = 'ba-hit-flash';
+    stage.appendChild(flash);
+    setTimeout(() => flash.remove(), 500);
+  }
+
+  // Анимация "удара" на боссе
+  if (bossEl){
+    bossEl.classList.remove('hit');
+    void bossEl.offsetWidth;
+    bossEl.classList.add('hit');
+  }
+
+  // Урон
+  const baseDmg = baGetDamagePerThrow();
+  const dmg = isCrit ? Math.floor(baseDmg * 3) : baseDmg;
+
+  // Всплывающий урон
+  if (stage){
+    const dmgEl = document.createElement('div');
+    dmgEl.className = 'ba-dmg' + (isCrit ? ' crit' : '');
+    dmgEl.innerText = '-' + dmg.toLocaleString('ru-RU');
+    dmgEl.style.left = x + 'px';
+    dmgEl.style.top  = y + 'px';
+    stage.appendChild(dmgEl);
+    setTimeout(() => dmgEl.remove(), 950);
+  }
+
+  haptic('light');
+  try { playGulp(); } catch(_){}
+
+  // Наносим урон
+  damageBossByThrow(dmg);
+
+  // Обновляем UI
+  renderBossArena();
+
+  if (STATE.boss.hp <= 0){
+    showBossVictoryInArena();
+  }
+}
+
+function onBeerMiss(x, y){
+  const stage = document.getElementById('ba-stage');
+  if (!stage) return;
+  const missEl = document.createElement('div');
+  missEl.className = 'ba-miss';
+  missEl.innerText = 'МИМО';
+  missEl.style.left = x + 'px';
+  missEl.style.top  = y + 'px';
+  stage.appendChild(missEl);
+  setTimeout(() => missEl.remove(), 850);
+}
+
+function damageBossByThrow(dmg){
+  if (STATE.boss.defeated) return;
+  STATE.boss.hp = Math.max(0, STATE.boss.hp - dmg);
+  if (STATE.boss.hp <= 0){
+    onBossDefeated();
+  } else {
+    saveBoss();
+  }
+  // Проверка фазы
+  const prevPhase = lastBossPhase;
+  checkBossPhase();
+  if (lastBossPhase !== prevPhase){
+    renderBossArena();
+  }
+}
+
+function showBossVictoryInArena(){
+  const vEl = document.getElementById('ba-victory');
+  if (!vEl) return;
+  vEl.classList.add('on');
+  haptic('success');
+  try { playReward(); } catch(_){}
+
+  // Салют частиц
+  try {
+    const stage = document.getElementById('ba-stage');
+    const r = stage.getBoundingClientRect();
+    for (let i = 0; i < 6; i++){
+      setTimeout(() => {
+        spawnParticles(
+          r.left + Math.random() * r.width,
+          r.top + r.height * 0.3 + Math.random() * 100,
+          '#f7c948',
+          10
+        );
+      }, i * 120);
+    }
+  } catch(_){}
+}
 </script>
 </body>
 </html>
