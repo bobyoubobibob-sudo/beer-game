@@ -1332,20 +1332,20 @@ html,body{
   from{transform:scale(.9);opacity:0;}
   to{transform:scale(1);opacity:1;}
 }
-.modal-icon{font-size:56px;margin-bottom:12px;line-height:1;}
+.modal-icon{font-size:38px;margin-bottom:8px;line-height:1;}
 .modal-title{
-  font-family:'Unbounded',sans-serif;font-size:18px;font-weight:700;
-  letter-spacing:-.3px;text-transform:uppercase;margin-bottom:8px;
+  font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:-.2px;text-transform:uppercase;margin-bottom:6px;
 }
 .modal-text{
-  font-size:13px;color:var(--dim);line-height:1.6;
-  margin-bottom:18px;font-weight:500;
+  font-size:12px;color:var(--dim);line-height:1.55;
+  margin-bottom:14px;font-weight:500;
 }
 .modal-text b{color:var(--amber);font-weight:800;}
 .modal-buttons{display:flex;gap:8px;margin-top:12px;}
 .modal-buttons button{
-  flex:1;padding:12px;border:none;border-radius:10px;
-  cursor:pointer;font-family:'Manrope';font-weight:800;font-size:13px;
+  flex:1;padding:10px;border:none;border-radius:9px;
+  cursor:pointer;font-family:'Manrope';font-weight:800;font-size:12px;
   position:relative;overflow:hidden;
   transition:transform .1s;
 }
@@ -4774,7 +4774,7 @@ function tick(dt){
       const m = MUGS[STATE.curMug];
 
       if (sweet){
-        STATE.combo = Math.min(5, STATE.combo + 0.012 * comboMult);
+                STATE.combo = Math.min(5, STATE.combo + dt * 0.0035 * comboMult);
         if (STATE.combo > STATE.maxCombo) STATE.maxCombo = STATE.combo;
         if (STATE.combo >= MARATHON_COMBO_TRIGGER && !isMarathonActive()){
           startMarathon();
@@ -4799,7 +4799,8 @@ function tick(dt){
     }
   } else {
     STATE.chug = Math.max(0, STATE.chug - dt * 0.1);
-    STATE.combo = 1;
+    // Комбо медленно падает, не сбрасывается в 1
+    STATE.combo = Math.max(1, STATE.combo - dt * 0.0018);
   }
 
   if (STATE.autoLps > 0){
@@ -7145,9 +7146,11 @@ function startBattle(){
   const modal = document.getElementById('battle-modal');
 
   modal.innerHTML = `
-    <div class="battle-header">
+    <div class="battle-header" style="position:relative">
+      <button onclick="closeBattle()" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(15,12,8,.9);border:1px solid var(--border-2);color:#fff;font-size:18px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:5;">×</button>
       <div class="battle-title">⚔️ ЛОВИ КРУЖКИ!</div>
       <div class="battle-sub">Ставка: ${battleState.stake.toLocaleString('ru-RU')} ₽</div>
+    </div>class="battle-sub">Ставка: ${battleState.stake.toLocaleString('ru-RU')} ₽</div>
     </div>
     <div class="battle-stage" style="padding:12px 16px 16px">
       <div class="battle-timer" id="battle-timer">${BATTLE_DURATION}</div>
