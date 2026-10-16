@@ -4348,8 +4348,8 @@ window.nextOnbSlide = () => {
   }, { passive: true });
 })();
 
-/* BOOT */
-(function boot(){
+/* BOOT — откладываем на конец загрузки, чтобы все const из Части 8 были готовы */
+function boot(){
   if (STATE.charId && CHARACTERS.find(c=>c.id===STATE.charId)){
     applyOfflineEarnings();
     showApp();
@@ -4358,7 +4358,8 @@ window.nextOnbSlide = () => {
   } else {
     showSetup('splash');
   }
-})();
+}
+setTimeout(boot, 0);
 
 /* =========================================================
    CANVAS + ПАРАЛЛАКС + ЧАСТИЦЫ
